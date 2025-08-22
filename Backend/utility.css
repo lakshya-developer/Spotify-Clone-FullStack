@@ -1,0 +1,66 @@
+.border {
+  border: 2px solid red;
+}
+
+.flex {
+  display: flex;
+}
+.flex-d-column {
+  flex-direction: column;
+}
+.justify-center {
+  justify-content: center;
+}
+
+.item-center {
+  align-items: center;
+}
+
+.bg-color {
+  background-color: #121212;
+  color: rgb(141, 141, 141);
+}
+.hover-bg:hover {
+  background-color: #333333;
+}
+.hover-c:hover {
+  color: white;
+}
+.pointer {
+  cursor: pointer;
+}
+.invert {
+  filter: invert(1);
+}
+
+.rounded {
+  border-radius: 10px;
+}
+
+.p-1 {
+  padding: 0px 15px;
+}
+
+.m-1 {
+  margin: 15px 0px;
+}
+
+/* Width */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #333; /* Dark color for the track */
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #666; /* Lighter color for the handle */
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #888; /* Lighter color on hover */
+}

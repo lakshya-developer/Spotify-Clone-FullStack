@@ -1,0 +1,52 @@
+<header class="glass-effect py-6 shadow-2xl border-b border-gray-700/50 sticky top-0 z-50">
+  <div class="flex flex-col justify-between items-center md:flex-row container mx-auto px-6 max-w-7xl">
+    <div class="mb-4 md:mb-0">
+      <h1 class="text-white text-4xl font-bold tracking-wide transition-all duration-300 cursor-pointer float-animation">
+        <a href="/" class="flex items-center group">
+          <span class="gradient-text logo-glow group-hover:scale-105 transition-transform duration-300">
+            Airbnb
+          </span>
+        </a>
+      </h1>
+    </div>
+    <div class="flex justify-center items-center gap-3">
+      <% if (isLoggedIn) { %>
+        <% if (userType === "guest") { %>
+          <a href="/home-list" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/home-list' ? 'active-nav' : '' %>">
+            Home List
+          </a>
+          <a href="/favourite" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/favourite' ? 'active-nav' : '' %>">
+            Favourite
+          </a>
+          <a href="/bookings" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/bookings' ? 'active-nav' : '' %>">
+            Bookings
+          </a>
+        <%} else { %>
+          <a href="/host" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/host' ? 'active-nav' : '' %>">
+            Host
+          </a>
+          <a href="/host/add-home" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/host/add-home' ? 'active-nav' : '' %>">
+            + Add Home
+          </a>
+        <% } %>
+        <a href="/user" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/user' ? 'active-nav' : '' %>">
+          Profile
+        </a>
+        <form action="/logout" method="POST" class="inline-block">
+          <button class="logout-btn px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:scale-105">
+            Logout
+          </button>
+        </form>
+      <%} else { %>
+        <div class="flex items-center gap-3">
+          <a href="/login" class="nav-button px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:bg-gray-700/50 hover:scale-105 hover:shadow-lg <%= currentPath === '/login' ? 'active-nav' : '' %>">
+            Login
+          </a>
+          <a href="/sign-up" class="signup-btn px-6 py-3 rounded-full text-white font-medium transition-all duration-300 hover:scale-105 <%= currentPath === '/sign-up' ? 'active-nav' : '' %>">
+            Sign Up
+          </a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</header>

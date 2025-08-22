@@ -1,0 +1,10 @@
+{
+    "title": "Sigma male songs",
+    "description": "Sigma songs for you.",
+    "cover": "cover.jpg",
+    "songs": [
+      { "file": "GigaChad Theme (Phonk House Version).mp3", "title": "GigaChad Theme (Phonk House Version)", "artist": "Traditional" },
+      { "file": "MoonDeity - NEON BLADE.mp3", "title": "MoonDeity - NEON BLADE", "artist": "Traditional" },
+      { "file": "SLAY!.mp3", "title": "SLAY!", "artist": "Traditional" }
+    ]
+}

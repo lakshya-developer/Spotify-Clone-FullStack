@@ -1,0 +1,9 @@
+{
+    "title": "Bollywood songs",
+    "description": "songs for you.",
+    "cover": "cover.jpg",
+    "songs": [
+      { "file": "Mere Ghar Ram Aaye Hain.mp3", "title": "Mere Ghar Ram Aaye Hain", "artist": "Singer X" }
+  ]
+}
+

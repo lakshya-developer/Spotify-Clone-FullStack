@@ -1,0 +1,12 @@
+{
+    "title": "bhajans",
+    "description": "bhajans for you.",
+    "cover": "cover.jpg",
+    "songs": [
+      { "file": "Hamare sath shree raghunath.mp3", "title": "Hamare sath shree raghunath", "artist": "Traditional" },
+      { "file": "Pata Nahi Kis Roop Me Aakar.mp3", "title": "Pata Nahi Kis Roop Me Aakar", "artist": "Traditional" },
+      { "file": "Ram Ayenge  Jaya Kishori.mp3", "title": "Ram Ayenge  Jaya Kishori", "artist": "Traditional" },
+      { "file": "Ram Na Milenge Hanuman Ke Bina I Hanuman Bhajan I LAKHBIR SINGH LAKKHA.mp3", "title": "Ram Na Milenge Hanuman Ke Bina I Hanuman Bhajan I LAKHBIR SINGH LAKKHA", "artist": "Traditional" },
+      { "file": "Rama Rama Ratate Ratate.mp3", "title": "Rama Rama Ratate Ratate", "artist": "Traditional" }
+    ]
+}

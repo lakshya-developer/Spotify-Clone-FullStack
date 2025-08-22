@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Spotify Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+      body {
+        font-family: "Roboto", sans-serif;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 12px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #333;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #666;
+        border-radius: 6px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #888;
+      }
+
+      .invert-filter {
+        filter: invert(1);
+      }
+
+      .playing {
+        background-color: rgb(0, 0, 0);
+        filter: invert();
+      }
+
+      .card-hover:hover {
+        background-color: #1b1a1a;
+      }
+
+      .card-hover:hover .play-button {
+        opacity: 1;
+        bottom: 35%;
+      }
+
+      .play-button {
+        position: absolute;
+        right: 10%;
+        bottom: 32%;
+        opacity: 0;
+        transition: all 0.5s ease-out;
+      }
+
+      .seekbar-circle {
+        position: absolute;
+        bottom: -6px;
+        left: -2px;
+        transition: left 0.5s;
+      }
+
+      .left-sidebar {
+        transition: all 0.3s ease;
+      }
+
+      /* Mobile sidebar - hidden by default, shown when toggled */
+      @media (max-width: 768px) {
+        .left-sidebar {
+          position: fixed;
+          left: -100%;
+          z-index: 50;
+          width: 280px;
+          height: 100vh;
+        }
+
+        .left-sidebar.show {
+          left: 0;
+        }
+
+        .main-content {
+          width: 100%;
+        }
+      }
+
+      /* Tablet and desktop - sidebar always visible */
+      @media (min-width: 769px) {
+        .left-sidebar {
+          position: relative;
+          left: 0;
+          width: 25%;
+        }
+
+        .main-content {
+          width: 75%;
+        }
+      }
+
+      /* Overlay for mobile when sidebar is open */
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        display: none;
+      }
+
+      .sidebar-overlay.show {
+        display: block;
+      }
+    </style>
+  </head>
+  <body class="bg-black text-white m-0 p-0">
+    <!-- Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="flex h-screen">
+      <!-- Left Sidebar -->
+      <div class="left-sidebar p-2 bg-black" id="leftSidebar">
+        <div class="mb-4">
+          <div class="flex justify-between items-center mb-2">
+            <img
+              class="invert-filter w-15 h-8"
+              src="/img/logo.svg"
+              alt="Spotify Logo"
+            />
+          </div>
+          <ul class="bg-gray-800 text-gray-400 rounded-lg p-4 space-y-3">
+            <li
+              class="flex items-center gap-4 cursor-pointer hover:text-white transition-colors"
+            >
+              <i class="fas fa-home w-6 h-6"></i>
+              <a href="/">Home</a>
+            </li>
+            <li
+              class="flex items-center gap-4 cursor-pointer hover:text-white transition-colors"
+            >
+              <i class="fas fa-search w-6 h-6"></i>
+              <span>Search</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="flex flex-col bg-gray-800 rounded-lg min-h-0 flex-1">
+          <div
+            class="flex items-center justify-between p-4 border-b border-gray-700"
+          >
+            <div
+              class="flex items-center gap-3 cursor-pointer hover:text-white transition-colors"
+            >
+              <i class="fas fa-book w-6 h-6"></i>
+              <span>Your library</span>
+            </div>
+            <div class="flex gap-2">
+              <div
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors"
+              >
+                <i class="fa-solid fa-plus text-sm"></i>
+              </div>
+              <div
+                class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors"
+              >
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto custom-scrollbar p-4">
+            <ul class="space-y-3" id="playlistContainer">
+              <!-- Playlist items will be populated by JavaScript -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Main Content -->
+      <div class="main-content bg-gray-900 flex flex-col">
+        <!-- Navigation -->
+        <div
+          class="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2"
+        >
+          <div class="flex items-center gap-4">
+            <a
+              href="/sign-up"
+              class="bg-white text-black px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 hover:text-base transition-all"
+            >
+              Sign Up
+            </a>
+            <a
+              href="/login"
+              class="bg-gray-700 px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 transition-all hidden md:block"
+            >
+              Login
+            </a>
+            <div
+              class="bg-gray-700 px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 transition-all hidden md:flex items-center gap-2"
+            >
+              <i class="fa-regular fa-circle-down text-white"></i>
+              <span>Install App</span>
+            </div>
+            <div
+              class="bg-gray-800 w-10 h-10 rounded-full flex items-center justify-center cursor-pointer hover:w-12 hover:h-12 transition-all"
+            >
+              <i class="fa-regular fa-bell text-white"></i>
+            </div>
+            <div
+              class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
+            >
+              <i class="fa-regular fa-user text-white"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-4 overflow-y-auto custom-scrollbar">
+          <h2 class="text-2xl font-bold mb-6">Spotify Playlist</h2>
+          <div
+            class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+            id="cardContainer"
+          >
+            <!-- Cards will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fixed Player Bar -->
+    <div
+      class="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-3/4 bg-gray-800 rounded-lg p-4"
+    >
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex-1">
+          <div class="songinfo text-sm">
+            <div class="text-white font-medium">Song Title</div>
+            <div class="text-gray-400 text-sm">Artist Name</div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <img
+              id="volume-img"
+              class="invert-filter w-5 h-5 cursor-pointer"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTExIDVMNiA5SDJWMTVINkwxMSAxOVY1WiIgZmlsbD0iIzMzMzMzMyIvPgo8cGF0aCBkPSJNMTkuMDcgNC45M0MyMC41IDYuMzYgMjEuNSA4LjM2IDIxLjUgMTJTMjAuNSAxNy42NCAxOS4wNyAxOS4wNyIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg=="
+              alt="Volume"
+            />
+            <input
+              class="w-20 cursor-pointer"
+              type="range"
+              name="volume"
+              value="100"
+            />
+          </div>
+
+          <div class="flex items-center gap-4">
+            <img
+              id="previous"
+              class="invert-filter w-5 h-5 cursor-pointer"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE5IDEyTDggMTlWNUwxOSAxMloiIGZpbGw9IiMzMzMzMzMiLz4KPHBhdGggZD0iTTUgMTlWNSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg=="
+              alt="Previous"
+            />
+            <img
+              id="play"
+              class="invert-filter w-6 h-6 cursor-pointer"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTggNUwxOSAxMkw4IDE5VjVaIiBmaWxsPSIjMzMzMzMzIi8+Cjwvc3ZnPgo="
+              alt="Play"
+            />
+            <img
+              id="next"
+              class="invert-filter w-5 h-5 cursor-pointer"
+              src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTUgMTJMMTYgNVYxOUw1IDEyWiIgZmlsbD0iIzMzMzMzMyIvPgo8cGF0aCBkPSJNMTkgNVYxOSIgc3Ryb2tlPSIjMzMzMzMzIiBzdHJva2Utd2lkdGg9IjIiLz4KPC9zdmc+Cg=="
+              alt="Next"
+            />
+          </div>
+
+          <div class="songtime text-sm text-gray-400">1:23 / 3:45</div>
+        </div>
+      </div>
+
+      <div class="relative w-full h-0.5 bg-white rounded cursor-pointer">
+        <div
+          class="seekbar-circle w-3 h-3 bg-white rounded-full cursor-pointer"
+        ></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- <script>
+      // Toggle sidebar for mobile
+      function toggleSidebar() {
+        const sidebar = document.getElementById("leftSidebar");
+        const overlay = document.getElementById("sidebarOverlay");
+
+        sidebar.classList.toggle("show");
+        overlay.classList.toggle("show");
+      }
+
+      // Close sidebar when clicking overlay
+      document
+        .getElementById("sidebarOverlay")
+        .addEventListener("click", function () {
+          toggleSidebar();
+        });
+
+      // Sample JavaScript to populate content
+      document.addEventListener("DOMContentLoaded", function () {
+        // Sample playlist data
+        const playlists = [
+          { name: "Liked Songs", image: "img/playlist1.jpg" },
+          { name: "My Playlist #1", image: "img/playlist2.jpg" },
+          { name: "Discover Weekly", image: "img/playlist3.jpg" },
+          { name: "Release Radar", image: "img/playlist4.jpg" },
+          { name: "Chill Vibes", image: "img/playlist5.jpg" },
+          { name: "Rock Collection", image: "img/playlist6.jpg" },
+        ];
+
+        // Sample cards data
+        const cards = [
+          { title: "Today's Top Hits", image: "img/card1.jpg" },
+          { title: "RapCaviar", image: "img/card2.jpg" },
+          { title: "All Out 2010s", image: "img/card3.jpg" },
+          { title: "Rock Classics", image: "img/card4.jpg" },
+          { title: "Chill Hits", image: "img/card5.jpg" },
+          { title: "Viva Latino", image: "img/card6.jpg" },
+          { title: "Pop Rising", image: "img/card7.jpg" },
+          { title: "Jazz Classics", image: "img/card8.jpg" },
+        ];
+
+        // Populate playlist sidebar
+        const playlistContainer = document.getElementById("playlistContainer");
+        playlists.forEach((playlist) => {
+          const li = document.createElement("li");
+          li.className =
+            "flex items-center justify-between p-3 border-2 border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors";
+          li.innerHTML = `
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 bg-gray-700 rounded flex items-center justify-center">
+                <i class="fas fa-music text-gray-400"></i>
+              </div>
+              <div>
+                <div class="text-white text-sm font-medium">${playlist.name}</div>
+                <div class="text-gray-400 text-xs">Playlist</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="text-green-500 hover:text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-play"></i>
+              </button>
+            </div>
+          `;
+          li.classList.add("group");
+          playlistContainer.appendChild(li);
+        });
+
+        // Populate main content cards
+        const cardContainer = document.getElementById("cardContainer");
+        cards.forEach((card) => {
+          const cardDiv = document.createElement("div");
+          cardDiv.className =
+            "card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-colors relative group";
+          cardDiv.innerHTML = `
+            <div class="w-full aspect-square bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
+              <i class="fas fa-music text-gray-500 text-3xl"></i>
+            </div>
+            <h3 class="text-white font-medium mb-1 truncate">${card.title}</h3>
+            <p class="text-gray-400 text-sm">Playlist</p>
+            <button class="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-colors">
+              <i class="fas fa-play text-sm"></i>
+            </button>
+          `;
+          cardContainer.appendChild(cardDiv);
+        });
+      });
+    </script> -->
+  </body>
+</html>

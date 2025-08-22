@@ -1,0 +1,10 @@
+{
+    "title": "Haryanvi songs",
+    "description": "Haryanvi songs for you.",
+    "cover": "cover.jpg",
+    "songs": [
+      { "file": "Dhai Litre Dudh Gelya Barah Tikkad Khau Su.mp3", "title": "Dhai Litre Dudh Gelya Barah Tikkad Khau Su", "artist": "Traditional" },
+      { "file": "Kallo Ajay Hooda Pooja Hooda.mp3", "title": "Kallo Ajay Hooda Pooja Hooda", "artist": "Singer X" },
+      { "file": "SOLID BODY  AjaHooda ,Anjali Raghav.mp3", "title": "SOLID BODY  AjaHooda ,Anjali Raghav", "artist": "Traditional" }
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "title": "Rajasthani Songs",
+    "description": "Rajasthani songs for you.",
+    "cover": "cover.jpg",
+    "songs": [
+      { "file": "BANNI THARO BANNO DIWANO GADI FORTUNER LAYO.mp3", "title": "BANNI THARO BANNO DIWANO GADI FORTUNER LAYO", "artist": "Traditional" },
+      { "file": "Chaudhary   Amit Trivedi.mp3", "title": "Chaudhary   Amit Trivedi", "artist": "Traditional" },
+      { "file": "Kabootar  Renuka Panwar, Pranjal Dahiya.mp3", "title": "Kabootar  Renuka Panwar, Pranjal Dahiya", "artist": "Traditional" },
+      { "file": "Meri Manisha Ki Yahi Pahchan.mp3", "title": "Meri Manisha Ki Yahi Pahchan", "artist": "Traditional" },
+      { "file": "Peeli Lugdi Gori Nakhrawali.mp3", "title": "Peeli Lugdi Gori Nakhrawali", "artist": "Traditional" }
+    ]
+}
