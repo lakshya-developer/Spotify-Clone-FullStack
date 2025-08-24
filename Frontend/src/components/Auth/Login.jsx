@@ -38,6 +38,7 @@ export default function Login() {
         
         if(response.ok){
           navigate('/');
+          console.log("User Logged In")
         } else {
           const data = await response.json()
           if (data.msg) {

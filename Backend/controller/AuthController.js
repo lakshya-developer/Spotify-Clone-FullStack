@@ -135,18 +135,6 @@ exports.checkLogin = (req, res, next) => {
   if(req.session.isLoggedIn === true){
     res.status(200).send("Logged In")
   }else{
-    res.status(403).send("Not Logged In")
+    res.status(401).send("Not Logged In")
   }
 }
-
-// import LeftSidebar from "./components/LeftSidebar";
-// import RightSide from "./components/RightSide";
-
-// export default function App() {
-//   return (
-//     <div className="flex h-screen bg-black text-white">
-//       <LeftSidebar />
-//       <RightSide />
-//     </div>
-//   );
-// }

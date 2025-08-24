@@ -26,7 +26,10 @@ const store = new MongoDBStore({
 app.use(express.static(path.join(rootDir, "public")));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // allows frontend
+  credentials: true,               // allows cookies to be sent
+}));
 
 app.use(session({
   secret: "airbnb.lakshya",
