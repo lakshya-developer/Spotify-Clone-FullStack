@@ -110,31 +110,55 @@ exports.postSignUp = [
 }]
 
 exports.postLogin = async (req, res, next) => {
-  const {email, password} = req.body;
+  try {
+    const {email, password} = req.body;
 
-  const user = await User.findOne({email: email});
-  if(!user){
-    return res.status(400).json({message: "Invalid email or password."})
+    const user = await User.findOne({email: email});
+    if(!user){
+      return res.status(401).json({message: "Invalid email or password."});
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if(!isMatch){
+      return res.status(401).json({message: "Invalid email or password."});
+    }
+
+    req.session.isLoggedIn = true;
+    req.session.user = user;
+    await req.session.save();
+
+    // Return user data after successful login
+    const userData = {
+      id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      userType: user.userType
+    };
+
+    return res.status(200).json({
+      message: "Login successful",
+      user: userData
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+    return res.status(500).json({message: "An error occurred during login"});
   }
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if(!isMatch){
-    return res.status(400).json({message: "Invalid email or password."})
-  }
-
-  req.session.isLoggedIn = true;
-  req.session.user = user;
-  await req.session.save();
-  console.log("user logged in");
-  return res.status(201).json({message: "User Logged In."})
-
-  // res.redirect('/');
 }
 
 exports.checkLogin = (req, res, next) => {
   if(req.session.isLoggedIn === true){
-    res.status(200).send("Logged In")
-  }else{
-    res.status(401).send("Not Logged In")
+    // Send only necessary user data, excluding sensitive information
+    const userData = {
+      id: req.session.user._id,
+      firstName: req.session.user.firstName,
+      lastName: req.session.user.lastName,
+      email: req.session.user.email,
+      userType: req.session.user.userType
+    };
+    res.status(200).json(userData);
+  } else {
+    res.status(401).json({ message: "Not Logged In" });
   }
 }

@@ -3,21 +3,29 @@ import { Link } from "react-router-dom";
 import { useLoginCheck } from "../context/LoginContext";
 
 export default function RightSide() {
-  const { isLoggedIn } = useLoginCheck();
+  const { isLoggedIn, user } = useLoginCheck();
+
   const cards = [
     { title: "Today's Top Hits" },
     { title: "RapCaviar" },
     { title: "All Out 2010s" },
     { title: "Rock Classics" },
     { title: "Chill Hits" },
-  ];
+  ];  
 
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">
       {/* Navigation */}
       <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
         <div className="flex items-center gap-4">
-          {isLoggedIn ? (
+          {isLoggedIn && user ? (
+            <Link
+              to="/music/user-profile"
+              className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
+            >
+              {user.firstName.charAt(0)}
+            </Link>
+          ) : (
             <>
               <Link
                 to="/sign-up"
@@ -32,13 +40,6 @@ export default function RightSide() {
                 Login
               </Link>
             </>
-          ) : (
-            <Link
-              to="/music/user-profile"
-              className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
-            >
-              User
-            </Link>
           )}
         </div>
       </div>

@@ -11,7 +11,6 @@ const urlDB = "mongodb+srv://root:iamadminlakshya@lakshyadeveloper.nkcqqvp.mongo
 
 // Local Module Routes
 const rootDir = require("./utils/pathUtil");
-const routeController = require("./controller/routeController");
 const AuthController = require("./controller/AuthController");
 const app = express();
 
@@ -44,7 +43,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/' , routeController.getHome)
+// app.get('/' , routeController.getHome)
 app.use('/api/sign-up', AuthController.postSignUp);
 app.use('/api/login', AuthController.postLogin);
 app.use('/api/auth', AuthController.checkLogin);
