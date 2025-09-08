@@ -1,9 +1,35 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLoginCheck } from "../context/LoginContext";
 
 export default function RightSide() {
-  const { isLoggedIn, user } = useLoginCheck();
+  const { isLoggedIn, user, setIsLoggedIn, handleLogout } = useLoginCheck();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/auth", {
+          credentials: "include",
+        });
+
+        if (response.status === 200) {
+          const userData = await response.json();
+          console.log("User data:", userData);
+          // You can update your component state or context here with userData
+        } else {
+          console.log("Authentication failed");
+          // Handle authentication failure here
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Handle fetch error here
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  
 
   const cards = [
     { title: "Today's Top Hits" },
@@ -11,7 +37,7 @@ export default function RightSide() {
     { title: "All Out 2010s" },
     { title: "Rock Classics" },
     { title: "Chill Hits" },
-  ];  
+  ];
 
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">
@@ -19,12 +45,20 @@ export default function RightSide() {
       <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
         <div className="flex items-center gap-4">
           {isLoggedIn && user ? (
-            <Link
-              to="/music/user-profile"
-              className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
-            >
-              {user.firstName.charAt(0)}
-            </Link>
+            <>
+              <Link
+                to="/music/user-profile"
+                className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
+              >
+                {user.firstName.charAt(0)}
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:bg-gray-800 transition-all"
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Link
@@ -60,9 +94,7 @@ export default function RightSide() {
                 {card.title}
               </h3>
               <p className="text-gray-400 text-sm">Playlist</p>
-              <button 
-                className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0"
-              >
+              <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
                 <img className="w-4" src="/img/newplay.svg" alt="Play" />
               </button>
             </div>

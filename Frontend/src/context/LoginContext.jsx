@@ -44,6 +44,23 @@ function LoginProvider({children}) {
     checkAuth();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setIsLoggedIn(false);
+      } else {
+        console.error("Logout failed");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
+
   return (
     <LoginContext.Provider 
       value={{
@@ -52,6 +69,7 @@ function LoginProvider({children}) {
         user, 
         setUser,
         isLoading,
+        handleLogout,
         error
       }}
     >

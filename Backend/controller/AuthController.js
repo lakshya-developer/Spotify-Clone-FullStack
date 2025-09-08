@@ -3,21 +3,6 @@ const User = require("../models/users");
 const bcrypt = require("bcrypt");
 const { message } = require("prompt");
 
-exports.getSignUp = (req, res, next) => {
-  res.render("auth/sign-up", {
-    isLoggedIn: false,
-    currentPath: "/sign-up",
-    oldInput: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      userType: "",
-      term: "",
-    },
-    userType: "",
-  });
-}
-
 exports.postSignUp = [
   //First Name
   check("firstName")
@@ -78,49 +63,51 @@ exports.postSignUp = [
       }
       return true;
     }),
-  
+
   async (req, res, next) => {
-    const {firstName, lastName, email, password, userType} = req.body;
+    const { firstName, lastName, email, password, userType } = req.body;
     const error = validationResult(req);
-    console.log(req.body)
+    console.log(req.body);
 
-    if(!error.isEmpty()){
-      return res.status(400).json({error});
+    if (!error.isEmpty()) {
+      return res.status(400).json({ error });
     }
 
-    try{
-      bcrypt.hash(password, 12)
-      .then((hashedPassword) => {
-        const user = new User({
-          firstName,
-          lastName,
-          email,
-          password: hashedPassword,
-          userType
+    try {
+      bcrypt
+        .hash(password, 12)
+        .then((hashedPassword) => {
+          const user = new User({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+            userType,
+          });
+          return user.save();
         })
-        return user.save()
-      }).then((result) => {
-        console.log("User Created:", result);
-        return res.status(201).json({message: 'User Created'});
-      })
+        .then((result) => {
+          console.log("User Created:", result);
+          return res.status(201).json({ message: "User Created" });
+        });
     } catch (err) {
-      console.log("error occured", err)
+      console.log("error occured", err);
     }
-
-}]
+  },
+];
 
 exports.postLogin = async (req, res, next) => {
   try {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
 
-    const user = await User.findOne({email: email});
-    if(!user){
-      return res.status(401).json({message: "Invalid email or password."});
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(401).json({ message: "Invalid email or password." });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if(!isMatch){
-      return res.status(401).json({message: "Invalid email or password."});
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password." });
     }
 
     req.session.isLoggedIn = true;
@@ -133,20 +120,19 @@ exports.postLogin = async (req, res, next) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      userType: user.userType
+      userType: user.userType,
     };
 
     console.log("user logged in");
     return res.status(200).json({
       message: "Login successful",
-      user: userData
+      user: userData,
     });
-
   } catch (error) {
     console.error("Login error:", error);
-    return res.status(500).json({message: "An error occurred during login"});
+    return res.status(500).json({ message: "An error occurred during login" });
   }
-}
+};
 
 exports.checkLogin = (req, res, next) => {
   // First check if session exists
@@ -155,18 +141,44 @@ exports.checkLogin = (req, res, next) => {
   }
 
   // Then check if user is logged in
-  if (req.session.isLoggedIn  === true && req.session.user) {
+  if (req.session.isLoggedIn && req.session.user) {
     const userData = {
       id: req.session.user._id,
       firstName: req.session.user.firstName,
       lastName: req.session.user.lastName,
       email: req.session.user.email,
-      userType: req.session.user.userType
+      userType: req.session.user.userType,
     };
 
-    return res.status(200).json(userData);  // Changed to match frontend expectation
+    return res.status(200).json(userData); // Changed to match frontend expectation
   }
 
   // If not logged in or no user in session
-  return res.status(401).json({ message: "Not Logged In" });  // Changed 402 to 401
-}
+  return res.status(401).json({ message: "Not Logged In" }); // Changed 402 to 401
+};
+
+exports.logout = (req, res, next) => {
+  // Check if session exists
+  if (req.session) {
+    // Destroy the session
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ message: 'Error logging out' });
+      }
+      
+      // Clear the session cookie
+      res.clearCookie('connect.sid', {
+        path: '/',
+        httpOnly: true,
+        secure: false, // Set to true if using HTTPS
+        sameSite: 'lax'
+      });
+      
+      return res.status(200).json({ message: 'Logged out successfully' });
+    });
+  } else {
+    // If no session exists, just send success response
+    return res.status(200).json({ message: 'Already logged out' });
+  }
+};
