@@ -27,7 +27,7 @@ function LoginProvider({children}) {
         });
 
         if (response.status === 200) {
-          const userData = await response.json();
+          const userData = await response.json();  // Changed to match backend response
           setIsLoggedIn(true);
           setUser(userData);
         } else {
@@ -38,8 +38,6 @@ function LoginProvider({children}) {
         setError("Failed to check authentication status");
         setIsLoggedIn(false);
         setUser(null);
-      } finally {
-        // setIsLoading(false);
       }
     };
 

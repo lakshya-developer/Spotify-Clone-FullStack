@@ -36,7 +36,7 @@ export default function Login() {
         })
         
         
-        if(response.ok){
+        if(response.status === 200){
           navigate('/');
           console.log("User Logged In")
         } else {

@@ -2,12 +2,13 @@
 const path = require("path");
 // External Module
 const express = require("express");
-const session = require('express-session');
-const mongoose = require("mongoose"); 
-const MongoDBStore = require('connect-mongodb-session')(session); 
+const session = require("express-session");
+const mongoose = require("mongoose");
+const MongoDBStore = require("connect-mongodb-session")(session);
 const multer = require("multer");
 const cors = require("cors");
-const urlDB = "mongodb+srv://root:iamadminlakshya@lakshyadeveloper.nkcqqvp.mongodb.net/spotify?retryWrites=true&w=majority&appName=LakshyaDeveloper";
+const urlDB =
+  "mongodb+srv://root:iamadminlakshya@lakshyadeveloper.nkcqqvp.mongodb.net/spotify?retryWrites=true&w=majority&appName=LakshyaDeveloper";
 
 // Local Module Routes
 const rootDir = require("./utils/pathUtil");
@@ -19,24 +20,32 @@ app.set("views", "views");
 
 const store = new MongoDBStore({
   uri: urlDB,
-  collection: 'session'
-})
+  collection: "session",
+});
 
 app.use(express.static(path.join(rootDir, "public")));
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:5173', // allows frontend
-  credentials: true,               // allows cookies to be sent
-}));
+app.use(
+  cors({
+    origin: "http://localhost:5173", // allows frontend
+    credentials: true, // allows cookies to be sent
+  })
+);
 
-app.use(session({
-  secret: "airbnb.lakshya",
-  resave: false,
-  saveUninitialized: true,
-  store
-}))
-
+app.use(
+  session({
+    secret: "airbnb.lakshya",
+    resave: false,
+    saveUninitialized: true,
+    store,
+    cookie: {
+      secure: false, // Set to true if using HTTPS
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
+  })
+);
 
 app.use((req, res, next) => {
   console.log(req.url, req.method);
@@ -44,17 +53,20 @@ app.use((req, res, next) => {
 });
 
 // app.get('/' , routeController.getHome)
-app.use('/api/sign-up', AuthController.postSignUp);
-app.use('/api/login', AuthController.postLogin);
-app.use('/api/auth', AuthController.checkLogin);
+app.use("/api/sign-up", AuthController.postSignUp);
+app.use("/api/login", AuthController.postLogin);
+app.use("/api/auth", AuthController.checkLogin);
 
 const PORT = 3000;
 
-mongoose.connect(urlDB).then(() => {
-  console.log("Connected to MongoDB");
-  app.listen(PORT, () => {
-    console.log(`Server is running on address http://localhost:${PORT}`);
+mongoose
+  .connect(urlDB)
+  .then(() => {
+    console.log("Connected to MongoDB");
+    app.listen(PORT, () => {
+      console.log(`Server is running on address http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("Error while connecting to the database.", err);
   });
-}).catch(err => {
-  console.log("Error while connecting to the database.",err);
-});

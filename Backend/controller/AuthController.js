@@ -136,6 +136,7 @@ exports.postLogin = async (req, res, next) => {
       userType: user.userType
     };
 
+    console.log("user logged in");
     return res.status(200).json({
       message: "Login successful",
       user: userData
@@ -148,8 +149,13 @@ exports.postLogin = async (req, res, next) => {
 }
 
 exports.checkLogin = (req, res, next) => {
-  if(req.session.isLoggedIn === true){
-    // Send only necessary user data, excluding sensitive information
+  // First check if session exists
+  if (!req.session) {
+    return res.status(401).json({ message: "No session found" });
+  }
+
+  // Then check if user is logged in
+  if (req.session.isLoggedIn  === true && req.session.user) {
     const userData = {
       id: req.session.user._id,
       firstName: req.session.user.firstName,
@@ -157,8 +163,10 @@ exports.checkLogin = (req, res, next) => {
       email: req.session.user.email,
       userType: req.session.user.userType
     };
-    res.status(200).json(userData);
-  } else {
-    res.status(401).json({ message: "Not Logged In" });
+
+    return res.status(200).json(userData);  // Changed to match frontend expectation
   }
+
+  // If not logged in or no user in session
+  return res.status(401).json({ message: "Not Logged In" });  // Changed 402 to 401
 }
