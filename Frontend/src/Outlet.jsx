@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from 'react'
 import { Outlet } from "react-router-dom";
-import {LeftSidebar, PlayerBar, RightSide} from './components'
+import {LeftSidebar, RightSide, PlayerBar} from './components'
 import './App.css'
 
 

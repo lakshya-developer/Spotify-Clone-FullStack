@@ -1,15 +1,40 @@
 import React from "react";
+import { useRef, useState } from "react";
+import { Play, Pause } from "lucide-react";
+import { usePlayBarContext } from "../../context/PlayBarContext";
 
-export default function PlayerBar() {
+
+export default function PlayBar() {
+  const {currentSong, audioRef} = usePlayBarContext();
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  // useEffect(() => {
+  //   if (currentSong && audioRef.current) {
+  //     audioRef.current.play();
+  //   }
+  // }, [currentSong]);
+
+  if(!currentSong) return null;
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
   return (
     <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-3/4 bg-gray-800 rounded-lg p-4 z-50">
       <div className="flex items-center justify-between mb-2">
         <div className="flex-1">
           <div className="songinfo text-sm">
-            <div className="text-white font-medium">Song Title</div>
-            <div className="text-gray-400 text-sm">Artist Name</div>
+            <div className="text-white font-medium">{currentSong.title}</div>
+            <div className="text-gray-400 text-sm">{currentSong.artist}</div>
           </div>
         </div>
+        <audio ref={audioRef} src={currentSong.url} />
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <img

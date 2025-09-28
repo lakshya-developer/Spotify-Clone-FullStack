@@ -1,35 +1,16 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { useLoginCheck } from "../context/LoginContext";
+import Nav from "./nav/Nav";
 
 export default function RightSide() {
   const { isLoggedIn, user, setIsLoggedIn, handleLogout } = useLoginCheck();
+  const [homeContent, setHomeContent] = useState({
+    songs: [],
+    albums: [],
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/auth", {
-          credentials: "include",
-        });
-
-        if (response.status === 200) {
-          const userData = await response.json();
-          console.log("User data:", userData);
-          // You can update your component state or context here with userData
-        } else {
-          console.log("Authentication failed");
-          // Handle authentication failure here
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        // Handle fetch error here
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  
+  // x
 
   const cards = [
     { title: "Today's Top Hits" },
@@ -39,66 +20,87 @@ export default function RightSide() {
     { title: "Chill Hits" },
   ];
 
+  useEffect(() => {
+    // TODO: Replace with actual API calls
+    const fetchUserContent = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/music/getMusicHome",
+          {
+            credentials: "include",
+          }
+        );
+
+        if (response.ok) {
+          console.log(homeContent);
+          const data = await response.json();
+          setHomeContent(data);
+        }
+      } catch (error) {
+        console.error("Error fetching user content:", error);
+      }
+    };
+
+    fetchUserContent();
+  }, []);
+
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">
-      {/* Navigation */}
-      <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
-        <div className="flex items-center gap-4">
-          {isLoggedIn && user ? (
-            <>
-              <Link
-                to="/music/user-profile"
-                className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
-              >
-                {user.firstName.charAt(0)}
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:bg-gray-800 transition-all"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/sign-up"
-                className="bg-white text-black px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 hover:text-base transition-all"
-              >
-                Sign Up
-              </Link>
-              <Link
-                to="/login"
-                className="bg-gray-700 px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 transition-all hidden md:block"
-              >
-                Login
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
+      <Nav />
 
       {/* Main Content */}
-      <div className="flex-1 p-4 overflow-y-auto custom-scrollbar">
-        <h2 className="text-2xl font-bold mb-6">Spotify Playlist</h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {cards.map((card, idx) => (
-            <div
-              key={idx}
-              className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
-            >
-              <div className="w-full aspect-square bg-gray-700 rounded-lg mb-3 flex items-center justify-center">
-                <i className="fas fa-music text-gray-500 text-3xl"></i>
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 p-4 ">
+          <h2 className="text-2xl font-bold mb-6">Spotify Songs</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {homeContent.songs.map((song, idx) => (
+              <div
+                key={idx}
+                className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
+              >
+                <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                  <img
+                    src={song.coverPhoto || "/img/default-album.png"}
+                    alt={song.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-white font-medium mb-1 truncate">
+                  {song.title}
+                </h3>
+                <p className="text-gray-400 text-sm">Artist: {song.artist}</p>
+                <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
+                  <img className="w-4" src="/img/newplay.svg" alt="Play" />
+                </button>
               </div>
-              <h3 className="text-white font-medium mb-1 truncate">
-                {card.title}
-              </h3>
-              <p className="text-gray-400 text-sm">Playlist</p>
-              <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
-                <img className="w-4" src="/img/newplay.svg" alt="Play" />
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+        <div className="flex-1 p-4 ">
+          <h2 className="text-2xl font-bold mb-6">Spotify Albums</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {homeContent.albums.map((album, idx) => (
+              <div
+                key={idx}
+                className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
+              >
+                <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                  <img
+                    src={album.coverPhoto || "/img/default-album.png"}
+                    alt={album.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-white font-medium mb-1 truncate">
+                  {album.title}
+                </h3>
+                <p className="text-gray-400 text-sm">Playlist</p>
+                <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
+                  <img className="w-4" src="/img/newplay.svg" alt="Play" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>

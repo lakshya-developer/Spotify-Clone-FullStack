@@ -14,65 +14,40 @@ const LoginContext = createContext({
 function LoginProvider({children}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Fetch login status form API when the app loads
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/checkAuth", {
+        credentials: "include"
+      });
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/auth", {
-          credentials: "include"
-        });
-
-        if (response.status === 200) {
-          const userData = await response.json();  // Changed to match backend response
-          setIsLoggedIn(true);
-          setUser(userData);
-        } else {
-          setIsLoggedIn(false);
-          setUser(null);
-        }
-      } catch (err) {
-        setError("Failed to check authentication status");
+      if (response.status === 200) {
+        const userData = await response.json();
+        setIsLoggedIn(true);
+        setUser(userData);
+      } else {
         setIsLoggedIn(false);
         setUser(null);
       }
-    };
-
-    checkAuth();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (response.ok) {
-        setIsLoggedIn(false);
-      } else {
-        console.error("Logout failed");
-      }
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error("Auth check error:", error);
+      setIsLoggedIn(false);
+      setUser(null);
     }
   };
 
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
   return (
-    <LoginContext.Provider 
-      value={{
-        isLoggedIn, 
-        setIsLoggedIn, 
-        user, 
-        setUser,
-        isLoading,
-        handleLogout,
-        error
-      }}
-    >
+    <LoginContext.Provider value={{
+      isLoggedIn,
+      setIsLoggedIn,
+      user,
+      setUser,
+      checkAuthStatus
+    }}>
       {children}
     </LoginContext.Provider>
   );

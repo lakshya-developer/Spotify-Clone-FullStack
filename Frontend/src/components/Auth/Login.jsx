@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLoginCheck } from "../../context/LoginContext"; // Adjust the import based on your file structure
 
 export default function Login() {
+  const { checkAuthStatus } = useLoginCheck();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -26,30 +28,30 @@ export default function Login() {
     setErrors(newErrors);
     if (newErrors.length === 0) {
       // Submit logic here
-       try {
-        const response = await fetch("http://localhost:3000/api/login", {
+      try {
+        const response = await fetch("http://localhost:3000/api/auth/login", {
           method: "POST",
-          credentials:'include',
+          credentials: "include",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify(form)
-        })
-        
-        
-        if(response.status === 200){
-          navigate('/');
-          console.log("User Logged In")
+          body: JSON.stringify(form),
+        });
+
+        if (response.ok) {
+          await checkAuthStatus(); // Refresh auth status after successful login
+          navigate("/");
+          console.log("User Logged In");
         } else {
-          const data = await response.json()
+          const data = await response.json();
           if (data.msg) {
             setErrors(data.msg);
           } else {
             setErrors(["An unknown error occurred."]);
           }
-        } 
+        }
       } catch (err) {
-        console.log("Error occured while reagistering.", err)
+        console.log("Error occurred while logging in.", err);
       }
     }
   };
@@ -62,9 +64,9 @@ export default function Login() {
             <div className="flex justify-between items-center mb-2">
               <a href="/">
                 <img
-                className="invert w-25 h-8"
-                src="/img/logo.svg"
-                alt="Spotify Logo"
+                  className="invert w-25 h-8"
+                  src="/img/logo.svg"
+                  alt="Spotify Logo"
                 />
               </a>
             </div>

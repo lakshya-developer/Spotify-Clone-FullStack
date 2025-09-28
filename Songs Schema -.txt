@@ -1,0 +1,20 @@
+Songs Schema -
+
+	song id
+	song title
+	song audio file
+	song cover photo
+	song artist name
+	song artist user Id
+	song playsCount
+	song likes
+	song type [individual, In album]
+	song albumId	
+	
+Album Schema -
+	
+	Album title
+	Album description
+	Album cover photo
+	Album songs [] - songId
+	Album likes	

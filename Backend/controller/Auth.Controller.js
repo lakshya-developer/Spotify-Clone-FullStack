@@ -1,10 +1,12 @@
-const { check, validationResult } = require("express-validator");
-const User = require("../models/users");
-const bcrypt = require("bcrypt");
-const { message } = require("prompt");
+import { check, validationResult } from "express-validator";
+import bcrypt from "bcrypt";
+import User from "../models/users.js";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {upload} from "../middlewares/multer.middleware.js"; // Import multer middleware
 
-exports.postSignUp = [
-  //First Name
+export const postSignUp = [
+
+  // Validation rules
   check("firstName")
     .notEmpty()
     .withMessage("First name should not be empty")
@@ -13,67 +15,76 @@ exports.postSignUp = [
     .withMessage("First name should be at least of 3 characters.")
     .matches(/^[a-zA-Z\s]+$/)
     .withMessage("First name can only contain letters"),
-  // Last Name
   check("lastName")
     .notEmpty()
-    .withMessage("First name should not be empty")
+    .withMessage("Last name should not be empty")
     .trim()
     .isLength({ min: 3 })
-    .withMessage("First name should be at least of 3 characters.")
+    .withMessage("Last name should be at least of 3 characters.")
     .matches(/^[a-zA-Z\s]+$/)
-    .withMessage("First name can only contain letters"),
-  // Email
+    .withMessage("Last name can only contain letters"),
   check("email")
     .isEmail()
     .withMessage("Please enter a valid email")
     .normalizeEmail(),
-  // Password
   check("password")
     .isLength({ min: 8 })
-    .withMessage("Password should be at least 8 charters long")
+    .withMessage("Password should be at least 8 characters long")
     .matches(/[a-z]/)
-    .withMessage("Password must contain at least single lower case character")
+    .withMessage("Password must contain at least one lowercase character")
     .matches(/[A-Z]/)
-    .withMessage("Password must contain at least single upper case character")
+    .withMessage("Password must contain at least one uppercase character")
     .matches(/[!@#$%^&*()_<>?,.:{}|]/)
-    .withMessage("Password must contain at least single special character")
+    .withMessage("Password must contain at least one special character")
     .trim(),
-  // Confirm Password
   check("confirmPassword")
     .trim()
     .custom((value, { req }) => {
-      if (value != req.body.password) {
-        throw new Error("Password does not match");
+      if (value !== req.body.password) {
+        throw new Error("Passwords do not match");
       }
       return true;
     }),
-  // User Type
   check("userType")
     .notEmpty()
     .withMessage("Please select your user type.")
     .isIn(["artist", "listner"])
     .withMessage("Invalid User Type"),
-  // Terms and Conditions
   check("terms")
     .notEmpty()
-    .withMessage("Please accept the Terms and Conditons")
+    .withMessage("Please accept the Terms and Conditions")
     .custom((value) => {
-      if (value !== true) {
-        throw new Error("You must accept the terms and conditions");
+      if (value === "true" || value === true) {
+        return true;
       }
-      return true;
+      throw new Error("You must accept the terms and conditions");
     }),
 
   async (req, res, next) => {
     const { firstName, lastName, email, password, userType } = req.body;
     const error = validationResult(req);
+
     console.log(req.body);
 
     if (!error.isEmpty()) {
+      console.log(error);
       return res.status(400).json({ error });
     }
 
     try {
+      const exist = await User.findOne({ email: email });
+      if (exist) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      let userCoverPhotoUrl = ""; // Default to an empty string if no file is uploaded
+
+      if (req.files && req.files?.userCoverPhoto ) {
+        const userCoverPhotoPath = req.files?.userCoverPhoto[0]?.path; // Access the uploaded file path
+        const cloudinaryResponse = await uploadOnCloudinary(userCoverPhotoPath);
+        userCoverPhotoUrl = cloudinaryResponse.url;
+      }
+
       bcrypt
         .hash(password, 12)
         .then((hashedPassword) => {
@@ -83,6 +94,7 @@ exports.postSignUp = [
             email,
             password: hashedPassword,
             userType,
+            coverPhoto: userCoverPhotoUrl, // Save the URL as a string
           });
           return user.save();
         })
@@ -91,12 +103,13 @@ exports.postSignUp = [
           return res.status(201).json({ message: "User Created" });
         });
     } catch (err) {
-      console.log("error occured", err);
+      console.error("Error occurred during sign-up:", err);
+      return res.status(500).json({ message: "An unknown error occurred during sign-up" });
     }
   },
 ];
 
-exports.postLogin = async (req, res, next) => {
+export const postLogin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -134,7 +147,7 @@ exports.postLogin = async (req, res, next) => {
   }
 };
 
-exports.checkLogin = (req, res, next) => {
+export const checkLogin = (req, res, next) => {
   // First check if session exists
   if (!req.session) {
     return res.status(401).json({ message: "No session found" });
@@ -148,6 +161,7 @@ exports.checkLogin = (req, res, next) => {
       lastName: req.session.user.lastName,
       email: req.session.user.email,
       userType: req.session.user.userType,
+      coverPhoto: req.session.user.coverPhoto,
     };
 
     return res.status(200).json(userData); // Changed to match frontend expectation
@@ -157,7 +171,7 @@ exports.checkLogin = (req, res, next) => {
   return res.status(401).json({ message: "Not Logged In" }); // Changed 402 to 401
 };
 
-exports.logout = (req, res, next) => {
+export const logout = (req, res, next) => {
   // Check if session exists
   if (req.session) {
     // Destroy the session

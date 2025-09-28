@@ -1,69 +1,109 @@
 import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLoginCheck } from "../context/LoginContext";
+import { Nav } from "../components";
+import { useEffect } from "react";
 
 function User() {
   const { isLoggedIn, user, setIsLoggedIn, handleLogout } = useLoginCheck();
+  const [albumsNo, setalbumsNo] = useState({
+    songs: 0,
+    albums: 0,
+  });
 
+  useEffect((e) => {
+    if (user.userType === "artist") {
+      const fetchAlbumsN0 = async () => {
+        const response = await fetch(
+          "http://localhost:3000/api/music/getMusic",
+          {
+            method: "POST",
+            headers: {
+              credentials: "true",
+              "content-type": "application/json",
+            },
+            body: JSON.stringify({ userId: user.id }),
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.albums && data.songs) {
+            setalbumsNo({
+              songs: data?.songs?.length ?? 0,
+              albums: data?.albums?.length ?? 0,
+            });
+          }
+        }
+      };
+
+      fetchAlbumsN0();
+    }
+  }, []);
+
+  const profileImage = user.coverPhoto || "/img/default-profile.png"; // Fallback image
+
+  // Protection against null user or not logged in state
+  if (!isLoggedIn || !user) {
+    return (
+      <div className="main-content bg-gray-900 flex flex-col flex-1 items-center justify-center">
+        <div className="text-white text-xl mb-4">
+          Please log in to view your profile
+        </div>
+        <Link
+          to="/login"
+          className="bg-green-500 text-white px-6 py-3 rounded-full font-bold hover:bg-green-600 transition-all"
+        >
+          Go to Login
+        </Link>
+      </div>
+    );
+  }
+
+  // Rest of your component remains the same but wrapped in a fragment
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">
       {/* Navigation */}
-      <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
-        <div className="flex items-center gap-4">
-          {isLoggedIn && user ? (
-            <>
-              <Link
-                to="/music/user-profile"
-                className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:w-10 hover:h-10 transition-all"
-              >
-                {user.firstName.charAt(0)}
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:bg-gray-800 transition-all"
-              >
-                Logout
-              </button> 
-            </>
-          ) : (
-            <>
-              <Link
-                to="/sign-up"
-                className="bg-white text-black px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 hover:text-base transition-all"
-              >
-                Sign Up
-              </Link>
-              <Link
-                to="/login"
-                className="bg-gray-700 px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:px-5 hover:py-2.5 transition-all hidden md:block"
-              >
-                Login
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
+      <Nav />
 
       {/* Main Content */}
       <div className="flex-1 p-8 overflow-y-auto custom-scrollbar">
         {/* User Profile Header */}
         <div className="flex items-center gap-8 mb-12">
           <div className="w-48 h-48 bg-gray-700 rounded-full flex items-center justify-center">
-            <i className="fas fa-user text-6xl text-gray-400"></i>
+            {/* <i className="fas fa-user text-6xl text-gray-400"></i> */}
+            <img
+              src={profileImage}
+              className="w-full h-full rounded-full object-cover"
+              alt="User Profile"
+            />
           </div>
           <div>
-            <h1 className="text-4xl font-bold mb-2">{user.firstName} {user.lastName}</h1>
-            <p className="text-gray-400 mb-4">Premium Member</p>
+            <h1 className="text-4xl font-bold mb-2">
+              {user?.firstName} {user?.lastName}
+            </h1>
+            <p className="text-gray-400 mb-4">{user?.userType}</p>
             <div className="flex gap-6 text-sm text-gray-400">
-              <div>
-                <span className="font-bold text-white">12</span> Playlists
-              </div>
-              <div>
-                <span className="font-bold text-white">234</span> Following
-              </div>
-              <div>
-                <span className="font-bold text-white">1.2K</span> Followers
-              </div>
+              {user.userType === "artist" ? (
+                <div className="flex gap-6 text-gray-300">
+                  <div>
+                    <span className="font-bold text-white">
+                      {albumsNo.songs}
+                    </span>{" "}
+                    Songs
+                  </div>
+                  <div>
+                    <span className="font-bold text-white">
+                      {albumsNo.albums}
+                    </span>{" "}
+                    Albums
+                  </div>
+                  <div>
+                    <span className="font-bold text-white">234</span> Likes
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </div>

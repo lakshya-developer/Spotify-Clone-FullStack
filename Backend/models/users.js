@@ -1,12 +1,16 @@
 // Core Modules
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema({
-  firstName: {type: String, required: [true, 'First name is required  ']},
+  firstName: { type: String, required: [true, "First name is required  "] },
   lastName: String,
-  email: {type: String, required: [true, 'Email is required'], unique: true},
-  password: {type: String, required: [true, 'Password is required']},
-  userType: {type: String, enum: ['artist', 'listner'], default: 'listner'}
-})
+  email: { type: String, required: [true, "Email is required"], unique: true },
+  password: { type: String, required: [true, "Password is required"] },
+  userType: { type: String, enum: ["artist", "listner"], default: "listner" },
+  coverPhoto: { type: String, default: "" },
+  playlist: { type: mongoose.Schema.Types.ObjectId, ref: "songs" },
+});
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
+
+export default User;

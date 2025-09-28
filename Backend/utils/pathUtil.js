@@ -1,4 +1,7 @@
-// Core Module
-const path = require('path');
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-module.exports =  path.dirname(require.main.filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+export const rootDir = path.dirname(path.dirname(__filename));

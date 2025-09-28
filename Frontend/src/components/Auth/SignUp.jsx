@@ -10,21 +10,23 @@ export default function SignUp() {
     confirmPassword: "",
     userType: "",
     terms: false,
+    userCoverPhoto: null, // Add coverPhoto to the form state
   });
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, type, checked, value, files } = e.target;
     setForm((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]:
+        type === "checkbox" ? checked : type === "file" ? files[0] : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simple validation example
+
     const newErrors = [];
     if (!form.firstName) newErrors.push("First name is required.");
     if (!form.lastName) newErrors.push("Last name is required.");
@@ -34,35 +36,50 @@ export default function SignUp() {
       newErrors.push("Passwords do not match.");
     if (!form.userType) newErrors.push("User type is required.");
     if (!form.terms) newErrors.push("You must agree to the terms.");
+
     setErrors(newErrors);
-    console.log(errors)
-    if (newErrors.length === 0) {
-      try {
-        const response = await fetch("http://localhost:3000/api/sign-up", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(form)
-        })
-        
-        
-        if(response.ok){
-          navigate('/login');
-        } else {
-          const data = await response.json()
-          // If backend returns { error: { errors: [...] } }
-          if (data.error && Array.isArray(data.error.errors)) {
-            setErrors(data.error.errors.map(e => e.msg));
-          } else if (Array.isArray(data)) {
-            setErrors(data);
-          } else {
-            setErrors(["An unknown error occurred."]);
-          }
-        } 
-      } catch (err) {
-        console.log("Error occured while reagistering.", err)
+
+    if (newErrors.length > 0) return;
+
+    const formData = new FormData();
+    formData.append("firstName", form.firstName);
+    formData.append("lastName", form.lastName);
+    formData.append("email", form.email);
+    formData.append("password", form.password);
+    formData.append("confirmPassword", form.confirmPassword);
+    formData.append("userType", form.userType);
+    formData.append("terms", form.terms ? "true" : "false"); // ✅ send as string
+    if (form.coverPhoto) {
+      formData.append("userCoverPhoto", form.coverPhoto); // ✅ required by multer
+    }
+
+
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/signUp", {
+        method: "POST",
+        body: formData,
+      });
+
+      let data = {};
+      // try {
+      //   data = await response.json();
+      // } catch (jsonErr) {
+      //   console.error("Failed to parse JSON response", jsonErr);
+      // }
+
+      if (response.ok) {
+        alert("Sign-up successful!");
+        navigate("/login");
+      } else if (data?.error && Array.isArray(data.error.errors)) {
+        setErrors(data.error.errors.map((e) => e.msg));
+      } else if (Array.isArray(data)) {
+        setErrors(data);
+      } else {
+        setErrors(["An unknown error occurred."]);
       }
+    } catch (err) {
+      console.error("Network or server error during registration:", err);
+      setErrors(["Unable to reach server. Please try again later."]);
     }
   };
 
@@ -74,9 +91,9 @@ export default function SignUp() {
             <div className="flex justify-between items-center mb-2">
               <a href="/">
                 <img
-                className="invert w-25 h-8"
-                src="/img/logo.svg"
-                alt="Spotify Logo"
+                  className="invert w-25 h-8"
+                  src="/img/logo.svg"
+                  alt="Spotify Logo"
                 />
               </a>
             </div>
@@ -250,6 +267,20 @@ export default function SignUp() {
                   terms and conditions
                 </a>
               </label>
+            </div>
+
+            {/* Cover Photo */}
+            <div>
+              <label className="block mb-2 text-white font-semibold text-sm">
+                Cover Photo (Optional)
+              </label>
+              <input
+                type="file"
+                name="coverPhoto"
+                accept="image/*"
+                onChange={handleChange}
+                className="input-focus w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-gray-700 bg-opacity-80 text-white"
+              />
             </div>
 
             {/* Submit */}
