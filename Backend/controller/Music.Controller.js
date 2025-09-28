@@ -80,11 +80,9 @@ export const postAlbumAdd = async (req, res, next) => {
         albumCoverPhotoLocalPath
       );
       if (!cloudinaryResponse) {
-        res
-          .status(500)
-          .json({
-            message: "There was an error while uploading files on Cloudinary.",
-          });
+        res.status(500).json({
+          message: "There was an error while uploading files on Cloudinary.",
+        });
       }
       albumCoverPhotoUrl = cloudinaryResponse.url;
       console.log(cloudinaryResponse);
@@ -155,22 +153,83 @@ export const getMusicInfo = async (req, res, next) => {
     if (type === "song") {
       const song = await Songs.findById(id);
       if (!song) {
-        res
-          .status(400)
-          .json({ message: "Something went wrong." });
+        res.status(400).json({ message: "Something went wrong." });
       }
       res.status(200).json(song);
     } else {
       const album = await Album.findById(id);
-      if(!album){
-        res
-          .status(400)
-          .json({ message: "Something went wrong." });
+      if (!album) {
+        res.status(400).json({ message: "Something went wrong." });
       }
       res.status(200).json(album);
     }
   } catch (error) {
     console.log("An Error Occured", error);
-    res.status(500).json({message: "Error Occured"});
+    res.status(500).json({ message: "Error Occured" });
   }
+};
+
+export const addToAlbum = async (req, res, next) => {
+  const { title, userId, albumId } = req.body;
+  console.log("Title:", title);
+
+  if ([title].some((feild) => feild?.trim() === "")) {
+    res.status(400).json({ message: "Feilds cannot be empty." });
+  }
+
+  let audioLocalPath = "";
+  let coverLocalPath = "";
+
+  if (req.files) {
+    audioLocalPath = req.files?.audioFile[0]?.path;
+    coverLocalPath = req.files?.coverPhoto[0]?.path;
+  }
+
+  if (!coverLocalPath) {
+    res.status(400).json({ message: "Cover Image required." });
+  }
+
+  const audioFile = await uploadOnCloudinary(audioLocalPath);
+  const coverPhoto = await uploadOnCloudinary(coverLocalPath);
+
+  if (!audioFile) {
+    res.status(400).json({ message: "Audio file could'nt upload properly." });
+  }
+
+  const user = await User.findById(userId);
+  // console.log(user);
+  const artist = user.firstName + " " + user.lastName;
+
+  const song = await new Songs({
+    title: title,
+    audioFile: audioFile.url,
+    coverPhoto: coverPhoto?.url,
+    artist: artist,
+    artistId: user._id,
+    albumId: albumId,
+  });
+  await song.save();
+
+  const album = await Album.findById(albumId);
+
+  album.songs.push(song);
+  const updatedAlbum = await album.save();
+
+  console.log(updatedAlbum);
+
+  if (!album) {
+    res.status(404).json({ message: "Album not found." });
+  }
+
+  const addedSong = await Songs.findById(song._id).select(
+    " -audioFile -coverPhoto"
+  );
+
+  if (!addedSong) {
+    res
+      .status(500)
+      .json({ message: "Something went wrong while adding song." });
+  }
+
+  return res.status(201).json({ addedSong });
 };

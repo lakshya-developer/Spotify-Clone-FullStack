@@ -5,12 +5,12 @@ import { useContext } from "react";
 
 const PlayBarContext = createContext();
 
-function PlayBarProvider({ Children }) {
+function PlayBarProvider({ children }) {
   const audioRef = useRef(null);
   const [ currentSong, setCurrentSong ] = useState(null);
 
 
-  const fetchSongInfo = async () => {
+  const PlaySong = async (songId) => {
     try {
       const response = await fetch(
         "http://localhost:3000/api/music/getMusicInfo",
@@ -20,11 +20,12 @@ function PlayBarProvider({ Children }) {
           headers: {
             "content-Type": "application/json",
           },
+          body: JSON.stringify({id: songId, type: "song"})
         }
       );
 
       if(!response){
-        console.log("Error occured while sending request.")
+        console.log("Error occured while sending request.");
       }
 
       const data = await response.json();
@@ -43,8 +44,8 @@ function PlayBarProvider({ Children }) {
   };
 
   return (
-    <PlayBarContext.Provider value={{currentSong, fetchSongInfo, audioRef}}>
-      {Children}
+    <PlayBarContext.Provider value={{currentSong, PlaySong, audioRef}}>
+      {children}
     </PlayBarContext.Provider>
   );
 }

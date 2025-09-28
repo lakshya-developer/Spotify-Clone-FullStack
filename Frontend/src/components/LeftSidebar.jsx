@@ -45,8 +45,8 @@ export default function LeftSidebar() {
             </div>
             <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">
               <img
-                className="invert cursor-pointer w-6 h-8"
-                src="/img/play.svg"
+                className="invert cursor-pointer w-4 h-6"
+                src="https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039413/newplay_ed4019.svg"
                 alt=""
               />
             </button>

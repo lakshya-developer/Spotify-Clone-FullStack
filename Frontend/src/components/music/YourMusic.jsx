@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 import { Nav } from "../../components";
+import { usePlayBarContext } from "../../context/PlayBarContext";
 
 function YourMusic() {
   const { user } = useLoginCheck();
@@ -10,6 +11,7 @@ function YourMusic() {
     songs: [],
     albums: [],
   });
+  const { PlaySong } = usePlayBarContext();
 
   useEffect(() => {
     // TODO: Replace with actual API calls
@@ -94,9 +96,19 @@ function YourMusic() {
                         {user.firstName + " " + user.lastName}
                       </p>
                     </div>
-                    <button className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                    <button
+                      onClick={() => PlaySong(song._id, "song")}
+                      className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    >
                       <img className="w-4" src="/img/newplay.svg" alt="Play" />
                     </button>
+                    <div className="flex justify-center ml-2 align-center rounded-full px-2 py-1 hover:bg-gray-900">
+                      <img
+                        className="invert w-4 h-6 opacity-0 group-hover:opacity-100 cursor-pointer"
+                        src="https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759040459/icons8-delete_cxk5ju.svg"
+                        alt=""
+                      />
+                    </div>
                   </div>
                 ))
               ) : (
@@ -114,31 +126,26 @@ function YourMusic() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {userContent.albums.length > 0 ? (
                 userContent.albums.map((album) => (
-                  
-                    <div
-                      key={album._id}
-                      className="card-hover bg-gray-800 p-4 rounded-lg transition-all duration-300 relative group"
-                    >
-                      <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
-                        <img
-                          src={album.coverPhoto || "/img/default-album.png"}
-                          alt={album.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-white font-medium mb-1 truncate">
-                        {album.title}
-                      </h3>
-                      <p className="text-gray-400 text-sm">Your Album</p>
-                      <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0 cursor-pointer">
-                        <img
-                          className="w-4"
-                          src="/img/newplay.svg"
-                          alt="Play"
-                        />
-                      </button>
+                  <div
+                    key={album._id}
+                    className="card-hover bg-gray-800 p-4 rounded-lg transition-all duration-300 relative group"
+                  >
+                    <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                      <img
+                        src={album.coverPhoto || "/img/default-album.png"}
+                        alt={album.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    /* <div
+                    <h3 className="text-white font-medium mb-1 truncate">
+                      {album.title}
+                    </h3>
+                    <p className="text-gray-400 text-sm">Your Album</p>
+                    <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0 cursor-pointer">
+                      <img className="w-4" src="/img/newplay.svg" alt="Play" />
+                    </button>
+                  </div>
+                  /* <div
                       key={album._id}
                       className="bg-gray-800/40 p-4 rounded-lg cursor-pointer hover:bg-gray-800/60 transition-all group"
                     >
@@ -159,7 +166,6 @@ function YourMusic() {
                         <img className="w-4" src="/img/play.svg" alt="Play" />
                       </button>
                     </div> */
-                  
                 ))
               ) : (
                 <div className="col-span-full text-center py-12">
