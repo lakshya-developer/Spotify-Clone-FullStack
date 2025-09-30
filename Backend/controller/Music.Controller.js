@@ -156,12 +156,14 @@ export const getMusicInfo = async (req, res, next) => {
         res.status(400).json({ message: "Something went wrong." });
       }
       res.status(200).json(song);
-    } else {
-      const album = await Album.findById(id);
+    } else if (type === "album") {
+      const album = await Album.findById(id).populate('songs');
       if (!album) {
         res.status(400).json({ message: "Something went wrong." });
       }
       res.status(200).json(album);
+    } else {
+      res.status(404).json({message: "No such type data exist."})
     }
   } catch (error) {
     console.log("An Error Occured", error);
@@ -209,8 +211,24 @@ export const addToAlbum = async (req, res, next) => {
     albumId: albumId,
   });
   await song.save();
+  // const song = {
+  //   _id: "68d3c08c3fd98b69a3b6b89c",
+  //   title: "Test Song",
+  //   audioFile:
+  //     "http://res.cloudinary.com/dw0ehvbnr/video/upload/v1758707848/hqwc8zzx5...",
+  //   coverPhoto:
+  //     "http://res.cloudinary.com/dw0ehvbnr/image/upload/v1758707851/copxzgnov...",
+  //   artist: "Lakshya Verma",
+  //   artistId: "68d2a8b7c68b05d1bb8f4f2a",
+  //   likes: 0,
+  //   type: "individual",
+  //   albumId: null,
+  //   __v: 0,
+  // };
 
-  const album = await Album.findById(albumId);
+  const album = await Album.findById({_id: albumId});
+
+  console.log(album);
 
   album.songs.push(song);
   const updatedAlbum = await album.save();

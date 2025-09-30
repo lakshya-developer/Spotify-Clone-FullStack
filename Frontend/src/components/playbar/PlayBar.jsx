@@ -61,7 +61,7 @@ export default function PlayBar() {
   };
 
   return (
-    <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-3/4 bg-gray-800 rounded-lg p-4 z-50">
+    <div className="fixed bottom-5 left-1/2 mb-4 transform -translate-x-1/2 w-3/4 bg-gray-800 rounded-lg p-4 z-50">
       <div className="flex items-center justify-between mb-2">
         <div className="flex flex-row">
           <div className="w-12 h-12 bg-gray-700 rounded overflow-hidden mr-4">
