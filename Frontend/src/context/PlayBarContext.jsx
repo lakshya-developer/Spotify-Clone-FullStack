@@ -1,17 +1,24 @@
 import React from "react";
 import { createContext, useRef, useState } from "react";
-import { Play, Pause } from "lucide-react";
 import { useContext } from "react";
+import { useLoginCheck } from "./LoginContext";
 
 const PlayBarContext = createContext();
 
 function PlayBarProvider({ children }) {
   const audioRef = useRef(null);
   const [ currentSong, setCurrentSong ] = useState(null);
+  const { isLoggedIn } = useLoginCheck();
 
 
   const PlaySong = async (songId) => {
     try {
+
+      if(!isLoggedIn){
+        alert("Please Login First to listen a song.");
+        return null;
+      }
+
       const response = await fetch(
         "http://localhost:3000/api/music/getMusicInfo",
         {
@@ -42,9 +49,12 @@ function PlayBarProvider({ children }) {
       console.log("Error Occured", error);
     }
   };
+  
+
+  
 
   return (
-    <PlayBarContext.Provider value={{currentSong, PlaySong, audioRef}}>
+    <PlayBarContext.Provider value={{currentSong, setCurrentSong, PlaySong, audioRef}}>
       {children}
     </PlayBarContext.Provider>
   );

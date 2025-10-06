@@ -11,6 +11,7 @@ export default function Login() {
   });
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,6 +23,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     const newErrors = [];
     if (!form.email) newErrors.push("Email is required.");
     if (!form.password) newErrors.push("Password is required.");
@@ -52,6 +54,8 @@ export default function Login() {
         }
       } catch (err) {
         console.log("Error occurred while logging in.", err);
+      }finally{
+        setIsLoading(false);
       }
     }
   };
@@ -173,9 +177,17 @@ export default function Login() {
             <div className="pt-4">
               <button
                 type="submit"
-                className="btn-primary w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg bg-gradient-to-r from-green-500 to-black hover:from-green-400"
+                className="flex justify-center align-center btn-primary w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg bg-gradient-to-r from-green-500 to-black hover:from-green-400"
               >
-                Login
+                {isLoading ? (
+                  <>
+                    {/* Spinner Element */}
+                    <div className="w-5 h-5 mr-3 border-4 border-gray-300 rounded-full border-t-white animate-spin"></div>
+                    <span>Logging In...</span>
+                  </>
+                ) : (
+                  <span>Login</span>
+                )}
               </button>
             </div>
 

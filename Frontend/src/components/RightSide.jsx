@@ -3,16 +3,16 @@ import { Link, NavLink } from "react-router-dom";
 import { useLoginCheck } from "../context/LoginContext";
 import Nav from "./nav/Nav";
 import { usePlayBarContext } from "../context/PlayBarContext";
+import { useAlbumLoadContext } from "../context/AlbumLoadContext";
 
 export default function RightSide() {
-  const { isLoggedIn, user, setIsLoggedIn, handleLogout } = useLoginCheck();
   const [homeContent, setHomeContent] = useState({
     songs: [],
     albums: [],
+    artists: [],
   });
   const { PlaySong } = usePlayBarContext();
-
-  // x
+  const { songLoad } = useAlbumLoadContext();
 
   const cards = [
     { title: "Today's Top Hits" },
@@ -32,11 +32,13 @@ export default function RightSide() {
             credentials: "include",
           }
         );
+        const artistResponse = await fetch("http://localhost:3000/api/music/getArtistsInfo");
 
-        if (response.ok) {
+        if (response.ok && artistResponse.ok) {
           // console.log(homeContent);
           const data = await response.json();
-          setHomeContent(data);
+          const artistData = await artistResponse.json();
+          setHomeContent({songs: data.songs, albums: data.albums, artists: artistData});
         }
       } catch (error) {
         console.error("Error fetching user content:", error);
@@ -57,7 +59,7 @@ export default function RightSide() {
           <div className=" p-8 ">
             {/* --- Grid is now 4 columns --- */}
             <div className="grid grid-cols-4 gap-4">
-              {homeContent.songs.map((song) => (
+              {homeContent.songs?.map((song) => (
                 <div
                   key={song._id}
                   // --- Card is now a flex container for horizontal layout ---
@@ -94,9 +96,10 @@ export default function RightSide() {
         <div className="flex-1 p-4 ">
           <h2 className="text-2xl font-bold mb-6">Spotify Albums</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {homeContent.albums.map((album, idx) => (
+            {homeContent.albums?.map((album) => (
               <div
-                key={idx}
+                onClick={() => songLoad(album._id)}
+                key={album._id}
                 className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
               >
                 <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
@@ -113,6 +116,33 @@ export default function RightSide() {
                 <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
                   <img className="w-4" src="/img/newplay.svg" alt="Play" />
                 </button>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex-1 p-4 ">
+          <h2 className="text-2xl font-bold mb-6">Spotify Albums</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {homeContent.artists?.map((artist) => (
+              <div
+                onClick={() => songLoad(album._id)}
+                key={artist._id}
+                className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
+              >
+                <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                  <img
+                    src={artist.coverPhoto || "/img/default-album.png"}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-white font-medium mb-1 truncate">
+                  {artist.firstName + " " + artist.lastName}
+                </h3>
+                <p className="text-gray-400 text-sm">Artist</p>
+                  {/* <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
+                    <img className="w-4" src="/img/newplay.svg" alt="Play" />
+                  </button> */}
               </div>
             ))}
           </div>

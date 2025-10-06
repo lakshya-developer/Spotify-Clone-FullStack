@@ -19,7 +19,8 @@ const songSchema = mongoose.Schema({
   },
   albumId: {
     type: mongoose.Schema.Types.ObjectId,
-    default: null
+    default: null,
+    ref: "albums"
   },
 });
 

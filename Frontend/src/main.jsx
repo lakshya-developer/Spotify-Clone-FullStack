@@ -18,6 +18,7 @@ import {
 } from "./components";
 import { LoginProvider } from "./context/LoginContext.jsx";
 import { PlayBarProvider } from "./context/PlayBarContext.jsx";
+import { AlbumLoadProvider } from "./context/AlbumLoadContext.jsx";
 import ProtectedRoute from "./protectedRooutes/ProtectedRoute.jsx";
 
 const router = createBrowserRouter(
@@ -46,7 +47,9 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <LoginProvider>
       <PlayBarProvider>
-        <RouterProvider router={router} />
+        <AlbumLoadProvider>
+          <RouterProvider router={router} />
+        </AlbumLoadProvider>
       </PlayBarProvider>
     </LoginProvider>
   </StrictMode>

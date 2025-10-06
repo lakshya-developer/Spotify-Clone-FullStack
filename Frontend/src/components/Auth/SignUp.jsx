@@ -14,6 +14,7 @@ export default function SignUp() {
   });
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(flase);
 
   const handleChange = (e) => {
     const { name, type, checked, value, files } = e.target;
@@ -52,7 +53,6 @@ export default function SignUp() {
     if (form.coverPhoto) {
       formData.append("userCoverPhoto", form.coverPhoto); // ✅ required by multer
     }
-
 
     try {
       const response = await fetch("http://localhost:3000/api/auth/signUp", {
@@ -289,7 +289,15 @@ export default function SignUp() {
                 type="submit"
                 className="btn-primary w-full text-white font-semibold py-3 px-6 rounded-xl shadow-lg bg-gradient-to-r from-green-500 to-black hover:from-green-400"
               >
-                Create Account
+                {isLoading ? (
+                  <>
+                    {/* Spinner Element */}
+                    <div className="w-5 h-5 mr-3 border-4 border-gray-300 rounded-full border-t-white animate-spin"></div>
+                    <span>Signing Up...</span>
+                  </>
+                ) : (
+                  <span>Sign Up</span>
+                )}
               </button>
             </div>
 

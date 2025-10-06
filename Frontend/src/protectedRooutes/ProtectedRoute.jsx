@@ -1,7 +1,5 @@
 import { useLoginCheck } from "../context/LoginContext"
 import { useNavigate } from "react-router-dom";
-import { Navigate } from "react-router-dom";
-import { useEffect } from "react";
 
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn } =  useLoginCheck();

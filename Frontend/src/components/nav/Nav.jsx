@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 
 export default function Nav() {
-  const { isLoggedIn, setIsLoggedIn, user } = useLoginCheck();
+  const { isLoggedIn, setIsLoggedIn, user, setUser } = useLoginCheck();
 
   const handleLogout = async () => {
     try {
@@ -14,6 +14,7 @@ export default function Nav() {
 
       if (response.status === 200) {
         setIsLoggedIn(false);
+        setUser(null);
         console.log("Logout Successfull");
       } else {
         console.error("Logout Fail");
@@ -27,8 +28,8 @@ export default function Nav() {
   return (
     <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
       <div className="flex items-center gap-4">
-        {isLoggedIn && user ? (
-          <>
+        { user && isLoggedIn ? (
+          <>  
             {user.userType === "artist" ? (
               <>
                 <NavLink

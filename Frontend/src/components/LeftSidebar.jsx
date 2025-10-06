@@ -1,6 +1,9 @@
 import React from "react";
+import { AlbumLoad } from "./";
+import { useAlbumLoadContext } from "../context/AlbumLoadContext";
 
 export default function LeftSidebar() {
+  const { setAlbumSongs } = useAlbumLoadContext();
   const playlists = [
     { name: "Liked Songs" },
     { name: "My Playlist #1" },
@@ -40,8 +43,8 @@ export default function LeftSidebar() {
             <span>Your library</span>
           </div>
           <div className="flex gap-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">
-              <img className="invert w-6 h-8" src="/img/close.svg" alt="" />
+            <div onClick={() => setAlbumSongs(null)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">
+              <img className="invert w-6 h-8" src="https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039805/close_vm8fhk.svg" alt="" />
             </div>
             <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">
               <img
@@ -52,41 +55,7 @@ export default function LeftSidebar() {
             </button>
           </div>
         </div>
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4">
-          <ul className="space-y-3">
-            {playlists.map((playlist, idx) => (
-              <li
-                key={idx}
-                className="flex items-center justify-between p-3 border-2 border-gray-600 rounded-lg cursor-pointer hover:bg-gray-700 transition-colors group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-700 rounded flex items-center justify-center">
-                    <img
-                      className="invert w-6 h-8"
-                      src="/img/music.svg"
-                      alt=""
-                    />
-                  </div>
-                  <div>
-                    <div className="text-white text-sm font-medium">
-                      {playlist.name}
-                    </div>
-                    <div className="text-gray-400 text-xs">Playlist</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button className="text-green-500 hover:text-green-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <img
-                      className="invert w-6 h-8"
-                      src="/img/play.svg"
-                      alt=""
-                    />
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <AlbumLoad />
       </div>
     </div>
   );

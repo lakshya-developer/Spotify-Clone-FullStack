@@ -7,5 +7,6 @@ import User from "./User"
 import AddMusic from "./music/AddMusic"
 import YourMusic from "./music/YourMusic";
 import Nav from "./nav/Nav";
+import AlbumLoad from "./music/AlbumLoad"
 
-export {LeftSidebar, RightSide, PlayerBar, SignUp, Login, User, AddMusic, YourMusic, Nav}
+export {LeftSidebar, RightSide, PlayerBar, SignUp, Login, User, AddMusic, YourMusic, Nav, AlbumLoad}

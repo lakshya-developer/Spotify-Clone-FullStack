@@ -251,3 +251,15 @@ export const addToAlbum = async (req, res, next) => {
 
   return res.status(201).json({ addedSong });
 };
+
+export const getArtistsInfo = async (req, res, next) => {
+  try {
+    const artists = await User.find({userType: "artist"}).select(" -password -userType");
+    if(!artists){
+      res.status(500).json({message: "There was an error retriving the Artists data."})
+    }
+    res.status(200).json(artists);
+  } catch (error) {
+    console.log("Error Occured:",error);
+  }
+}

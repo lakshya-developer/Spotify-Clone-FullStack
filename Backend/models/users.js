@@ -9,7 +9,8 @@ const userSchema = mongoose.Schema({
   userType: { type: String, enum: ["artist", "listner"], default: "listner" },
   coverPhoto: { type: String, default: "" },
   playlist: { type: mongoose.Schema.Types.ObjectId, ref: "songs" },
-  likedSongs: { type: mongoose.Schema.Types.ObjectId, ref: "songs"}
+  likedSongs: { type: mongoose.Schema.Types.ObjectId, ref: "songs"},
+  likedAlbums: { type: mongoose.Schema.Types.ObjectId, ref: "albums"}
 });
 
 const User = mongoose.model("User", userSchema);

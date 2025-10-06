@@ -2,9 +2,12 @@ import React from "react";
 import { useRef, useState, useEffect } from "react";
 import { Play, Pause } from "lucide-react";
 import { usePlayBarContext } from "../../context/PlayBarContext";
+import { useAlbumLoadContext } from "../../context/AlbumLoadContext";
 
 export default function PlayBar() {
-  const { currentSong, audioRef } = usePlayBarContext();
+  const { currentSong, setCurrentSong, audioRef } = usePlayBarContext();
+  const { albumSongs, currentSongIndex, setCurrentSongIndex, albumSongPlay } =
+    useAlbumLoadContext();
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(1);
   const [duration, setDuration] = useState("0:00");
@@ -60,6 +63,27 @@ export default function PlayBar() {
     setSeekBar(result);
   };
 
+  const handelRangeBar = (curTime, duration) => {
+    if (!audioRef.current) return;
+    const percent = Math.floor((curTime / duration) * 100);
+    const result = (percent / 1000) * 1100;
+    setSeekBar(result);
+  };
+
+  const playNext = () => {
+    if (!albumSongs) {
+      setIsPlaying(false);
+      return null;
+    }
+    if (currentSongIndex < albumSongs?.length - 1) {
+      albumSongPlay(albumSongs[currentSongIndex + 1]?._id);
+    } else {
+      setCurrentSongIndex(null);
+      // setCurrentSong(null);
+      setIsPlaying(false);
+    }
+  };
+
   return (
     <div className="fixed bottom-5 left-1/2 mb-4 transform -translate-x-1/2 w-3/4 bg-gray-800 rounded-lg p-4 z-50">
       <div className="flex items-center justify-between mb-2">
@@ -85,6 +109,7 @@ export default function PlayBar() {
             setCurrentTime(formateTime(e.target.currentTime));
             handelSeekBar(e.target.currentTime, e.target.duration);
           }}
+          onEnded={() => playNext()}
         />
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
@@ -133,14 +158,38 @@ export default function PlayBar() {
           <div className="songtime text-sm text-gray-400">
             {currentTime} / {duration}
           </div>
+
+          <div
+            onClick={() => setCurrentSong(null)}
+            className="w-5 h-5 p-1 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors"
+          >
+            <img
+              className="invert w-6 h-8"
+              src="https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039805/close_vm8fhk.svg"
+              alt=""
+            />
+          </div>
         </div>
       </div>
-      <div className="relative w-full h-0.5 bg-white rounded cursor-pointer">
+      {/* <div className="relative w-full h-0.5 bg-white rounded cursor-pointer">
         <div
           className="seekbar-circle w-3 h-3 bg-white rounded-full cursor-pointer absolute -bottom-1 transition ease-in-out"
           style={{ left: `${seekBar}px` }}
         ></div>
-      </div>
+      </div> */}
+      <input
+        type="range"
+        // min="0"
+        // max={duration} // total length of song
+        value={(audioRef?.current?.currentTime/audioRef?.current?.duration)*100} // current position
+        onChange={(e) => (audioRef.current.currentTime = (e.target.value/100*audioRef.current.duration))}
+        className="w-full h-0.5 cursor-pointer appearance-none bg-white rounded"
+        style={{
+          background: `linear-gradient(to right, white ${
+            (currentTime / duration) * 100
+          }%, rgba(255,255,255,0.3) 0%)`,
+        }}
+      />
     </div>
   );
 }
