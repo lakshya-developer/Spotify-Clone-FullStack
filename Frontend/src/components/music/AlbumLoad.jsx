@@ -7,12 +7,12 @@ function AlbumLoad() {
   const { albumSongs, currentSongIndex, setCurrentSongIndex, albumSongPlay } = useAlbumLoadContext();
 
   const playlists = [
-    { name: "Liked Songs" },
-    { name: "Playlists" },
-    { name: "Favourate" },
+    { name: "Liked Songs", cover: "https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759738027/heart_kso9me.svg" },
+    { name: "Playlists", cover: "https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759737485/playlist-play_uezlht.svg" },
+    { name: "Favourate", cover: "https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759738128/favourite_hs7ipy.svg" },
     { name: "Top Artists" },
-    { name: "Top Songs" },
-    { name: "Rock Collection" },
+    { name: "Top Songs", cover: "https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039811/music_zbhrzs.svg" },
+    { name: "Rock Collection", cover: "https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039811/music_zbhrzs.svg" },
   ];
 
   return (

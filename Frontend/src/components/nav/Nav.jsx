@@ -24,13 +24,12 @@ export default function Nav() {
     }
   };
 
-
   return (
     <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
       <div className="flex items-center gap-4">
-        { user && isLoggedIn ? (
-          <>  
-            {user.userType === "artist" ? (
+        {isLoggedIn ? (
+          <>
+            {user?.userType === "artist" ? (
               <>
                 <NavLink
                   to="/music/your-music"
@@ -53,7 +52,20 @@ export default function Nav() {
                   Add Music
                 </NavLink>
               </>
-            ) : null }
+            ) : (
+              <>
+                <NavLink
+                  to="/music/library"
+                  className={({ isActive }) =>
+                    `bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:text-base transition-all ${
+                      isActive ? "bg-gray-800" : "hover:bg-gray-800"
+                    }`
+                  }
+                >
+                  Library
+                </NavLink>
+              </>
+            )}
 
             <NavLink
               to="/music/user-profile"
@@ -63,7 +75,11 @@ export default function Nav() {
                 }`
               }
             >
-              <img className="rounded-full " src={user.coverPhoto} alt={user.firstName.charAt[0]} />
+              <img
+                className="rounded-full "
+                src={user.coverPhoto}
+                alt={user.firstName.charAt[0]}
+              />
             </NavLink>
             <button
               onClick={handleLogout}

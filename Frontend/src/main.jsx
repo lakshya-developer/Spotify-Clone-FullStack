@@ -15,6 +15,7 @@ import {
   User,
   AddMusic,
   YourMusic,
+  Library
 } from "./components";
 import { LoginProvider } from "./context/LoginContext.jsx";
 import { PlayBarProvider } from "./context/PlayBarContext.jsx";
@@ -36,6 +37,7 @@ const router = createBrowserRouter(
         <Route path="user-profile" element={<User />}></Route>
         <Route path="add-music" element={<AddMusic />}></Route>
         <Route path="your-music" element={<YourMusic />}></Route>
+        <Route path="library" element={<Library />}></Route>
       </Route>
       <Route path="sign-up" element={<SignUp />}></Route>
       <Route path="login" element={<Login />}></Route>
