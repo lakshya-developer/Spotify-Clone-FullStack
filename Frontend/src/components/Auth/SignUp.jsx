@@ -14,7 +14,7 @@ export default function SignUp() {
   });
   const [errors, setErrors] = useState([]);
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(flase);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, type, checked, value, files } = e.target;

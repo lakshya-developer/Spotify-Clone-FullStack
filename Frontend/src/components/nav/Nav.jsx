@@ -26,7 +26,7 @@ export default function Nav() {
 
   return (
     <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 relative">
         {isLoggedIn ? (
           <>
             {user?.userType === "artist" ? (
@@ -53,40 +53,52 @@ export default function Nav() {
                 </NavLink>
               </>
             ) : (
-              <>
-                <NavLink
-                  to="/music/library"
-                  className={({ isActive }) =>
-                    `bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:text-base transition-all ${
-                      isActive ? "bg-gray-800" : "hover:bg-gray-800"
-                    }`
-                  }
-                >
-                  Library
-                </NavLink>
-              </>
+              <NavLink
+                to="/music/library"
+                className={({ isActive }) =>
+                  `bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:text-base transition-all ${
+                    isActive ? "bg-gray-800" : "hover:bg-gray-800"
+                  }`
+                }
+              >
+                Library
+              </NavLink>
             )}
 
-            <NavLink
-              to="/music/user-profile"
-              className={({ isActive }) =>
-                `w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer hover:text-base transition-all ${
-                  isActive ? "bg-gray-800" : "hover:bg-gray-800"
-                }`
-              }
-            >
-              <img
-                className="rounded-full "
-                src={user.coverPhoto}
-                alt={user.firstName.charAt[0]}
-              />
-            </NavLink>
-            <button
-              onClick={handleLogout}
-              className="bg-gray-700 text-white px-4 py-2 rounded-full text-sm font-bold cursor-pointer hover:bg-gray-800 hover:text-base transition-all"
-            >
-              Logout
-            </button>
+            {/* Profile icon and dropdown */}
+            <div className="relative group">
+              <div className="w-9 h-9 bg-gray-700 rounded-full flex items-center justify-center cursor-pointer overflow-hidden border border-gray-600 group-hover:border-gray-400 transition-all">
+                <img
+                  className="rounded-full w-full h-full object-cover"
+                  src={user.coverPhoto}
+                  alt={user.firstName?.charAt(0) || "U"}
+                />
+              </div>
+
+              {/* Dropdown - hover fix */}
+              <div
+                className="absolute right-0 top-11 bg-gray-900 text-white text-sm rounded-lg shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 w-40 py-2 z-50"
+                onMouseEnter={(e) =>
+                  e.currentTarget.classList.add("opacity-100", "visible")
+                }
+                onMouseLeave={(e) =>
+                  e.currentTarget.classList.remove("opacity-100", "visible")
+                }
+              >
+                <NavLink
+                  to="/music/user-profile"
+                  className="block px-4 py-2 hover:bg-gray-800"
+                >
+                  Your Profile
+                </NavLink>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-800"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
           </>
         ) : (
           <>

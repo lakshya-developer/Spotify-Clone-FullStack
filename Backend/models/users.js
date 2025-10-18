@@ -8,9 +8,14 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: [true, "Password is required"] },
   userType: { type: String, enum: ["artist", "listner"], default: "listner" },
   coverPhoto: { type: String, default: "" },
-  playlist: { type: mongoose.Schema.Types.ObjectId, ref: "songs" },
-  likedSongs: { type: mongoose.Schema.Types.ObjectId, ref: "songs"},
-  likedAlbums: { type: mongoose.Schema.Types.ObjectId, ref: "albums"}
+  playlist: [
+    {
+      name: { type: String },
+      songs: { type: mongoose.Schema.Types.ObjectId, ref: "Songs" },
+    },
+  ],
+  likedSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Songs" }],
+  likedAlbums: [{ type: mongoose.Schema.Types.ObjectId, ref: "Album" }],
 });
 
 const User = mongoose.model("User", userSchema);

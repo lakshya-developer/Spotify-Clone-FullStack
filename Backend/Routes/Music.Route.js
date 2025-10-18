@@ -45,5 +45,8 @@ router.route("/addToAlbum").post(
   MusicController.addToAlbum
 );
 router.route("/getArtistsInfo").get(MusicController.getArtistsInfo);
+router.route("/getUserMusicData").post(MusicController.getUserMusicData);
+router.route("/likeSong").post(MusicController.postLikeSong);
+router.route("/likeAlbum").post(MusicController.postLikeAlbum);
 
 export default router;

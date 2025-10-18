@@ -157,13 +157,13 @@ export const getMusicInfo = async (req, res, next) => {
       }
       res.status(200).json(song);
     } else if (type === "album") {
-      const album = await Album.findById(id).populate('songs');
+      const album = await Album.findById(id).populate("songs");
       if (!album) {
         res.status(400).json({ message: "Something went wrong." });
       }
       res.status(200).json(album);
     } else {
-      res.status(404).json({message: "No such type data exist."})
+      res.status(404).json({ message: "No such type data exist." });
     }
   } catch (error) {
     console.log("An Error Occured", error);
@@ -226,7 +226,7 @@ export const addToAlbum = async (req, res, next) => {
   //   __v: 0,
   // };
 
-  const album = await Album.findById({_id: albumId});
+  const album = await Album.findById({ _id: albumId });
 
   console.log(album);
 
@@ -254,12 +254,97 @@ export const addToAlbum = async (req, res, next) => {
 
 export const getArtistsInfo = async (req, res, next) => {
   try {
-    const artists = await User.find({userType: "artist"}).select(" -password -userType");
-    if(!artists){
-      res.status(500).json({message: "There was an error retriving the Artists data."})
+    const artists = await User.find({ userType: "artist" }).select(
+      " -password -userType"
+    );
+    if (!artists) {
+      res
+        .status(500)
+        .json({ message: "There was an error retriving the Artists data." });
     }
     res.status(200).json(artists);
   } catch (error) {
-    console.log("Error Occured:",error);
+    console.log("Error Occured:", error);
+  }
+};
+
+export const getUserMusicData = async (req, res, next) => {
+  const { userId, type } = req.body;
+  try {
+    if (type === "songs") {
+      const user = await User.findById(userId).populate("likedSongs");
+      if (!user) {
+        res.status(404).json({ message: "User does not exist." });
+      }
+      const songs = user.likedSongs;
+      res.status(200).json(songs);
+    } else if (type === "playlist") {
+      const user = await User.findById(userId).populate("playlist");
+      if(!user){
+        res.status(404).json({message: "User does not exist."});
+      }
+      const playlist = user.playlist;
+      res.status(200).json(playlist);
+    } else if (type === "album") {
+      const user = await User.findById(userId).populate("likedAlbums");
+      if(!user){
+        res.status(404).json({message: "User does not exist."})
+      }
+      const albums = user.likedAlbums;
+      res.stauts(200).json(albums);
+    }
+    if(type === "all"){
+      const userSongs = await User.findById(userId).populate("likedSongs");
+      if (!userSongs) {
+        res.status(404).json({ message: "User does not exist." });
+      }
+      const userPlaylist = await User.findById(userId).populate("playlist");
+      const userAlbums = await User.findById(userId).populate("likedAlbums");
+      const songs = userSongs.likedSongs;
+      const playlist = userPlaylist.playlist;
+      const albums = userAlbums.likedAlbums;
+      res.status(200).json({songs, playlist, albums});
+    }
+  } catch (err) {
+    console.log("Error Occured:", err);
+  }
+};
+
+
+export const postLikeSong = async (req, res, next) => {
+  const { userId, songId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if(!user){
+      res.status(404).json({message: "User does not exist."});
+    }
+    const song = await Songs.findById(songId);
+    if(!song){
+      res.status(404).json({message: "Song does not exist."})
+    }
+    await User.updateOne({_id: userId},{$set: {likedSongs: songId}});
+    await Songs.updateOne({_id: songId}, {$set: {likes: (song.likes + 1)}})
+    res.status(200).json({message: "Song Liked"});
+  } catch (error) {
+    console.log("Error Occured:", error);
+  }
+}
+
+export const postLikeAlbum = async (req, res, next) => {
+  const { userId, albumId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if(!user){
+      res.status(404).json({message: "User does not exist."});
+    }
+    const album = await Album.findById(albumId);
+    if(!album){
+      res.status(404).json({message: "Song does not exist."})
+    }
+    await User.updateOne({_id: userId},{$set: {likedAlbums: albumId}});
+    await Songs.updateOne({_id: songId}, {$set: {likes: (album.likes + 1)}})
+    res.status(200).json({message: "Song Liked"});
+  } catch (error) {
+    console.log("Error Occured:", error);
   }
 }
