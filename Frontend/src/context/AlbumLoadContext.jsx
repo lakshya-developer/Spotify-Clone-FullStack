@@ -8,6 +8,7 @@ function AlbumLoadProvider({ children }) {
   const [albumSongs, setAlbumSongs] = useState(null);
   const [currentSongIndex, setCurrentSongIndex] = useState(null);
   const { PlaySong } = usePlayBarContext();
+  const [selectedItem, setSelectedItem] = useState(null); // track which section is opened
 
   const songLoad = async (albumId) => {
     try {
@@ -59,7 +60,9 @@ function AlbumLoadProvider({ children }) {
         songLoadPlay,
         currentSongIndex,
         setCurrentSongIndex,
-        albumSongPlay
+        albumSongPlay,
+        selectedItem,
+        setSelectedItem
       }}
     >
       {children}

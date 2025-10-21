@@ -9,5 +9,6 @@ import YourMusic from "./music/YourMusic";
 import Nav from "./nav/Nav";
 import AlbumLoad from "./music/AlbumLoad"
 import Library from "./music/Library";
+import Search from "./music/Search";
 
-export {LeftSidebar, RightSide, PlayerBar, SignUp, Login, User, AddMusic, YourMusic, Nav, AlbumLoad, Library}
+export {LeftSidebar, RightSide, PlayerBar, SignUp, Login, User, AddMusic, YourMusic, Nav, AlbumLoad, Library, Search}

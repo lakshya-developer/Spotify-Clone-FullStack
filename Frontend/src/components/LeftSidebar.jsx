@@ -1,17 +1,13 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import { AlbumLoad } from "./";
 import { useAlbumLoadContext } from "../context/AlbumLoadContext";
+import { useLoginCheck } from "../context/LoginContext";
 
 export default function LeftSidebar() {
   const { setAlbumSongs } = useAlbumLoadContext();
-  const playlists = [
-    { name: "Liked Songs" },
-    { name: "My Playlist #1" },
-    { name: "Discover Weekly" },
-    { name: "Release Radar" },
-    { name: "Chill Vibes" },
-    { name: "Rock Collection" },
-  ];
+  const { setSearchBar } = useLoginCheck();
+  
   return (
     <div
       className="left-sidebar p-2 bg-black min-w-[220px] max-w-xs flex flex-col"
@@ -32,7 +28,7 @@ export default function LeftSidebar() {
           </li>
           <li className="flex items-center gap-4 cursor-pointer hover:text-white transition-colors">
             <img className="invert w-6 h-8" src="/img/search.svg" alt="" />
-            <span>Search</span>
+            <a href="/music/search" onClick={() => setSearchBar(true)}>Search</a>
           </li>
         </ul>
       </div>
@@ -40,7 +36,9 @@ export default function LeftSidebar() {
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <div className="flex items-center gap-3 cursor-pointer hover:text-white transition-colors">
             <img className="invert w-6 h-8" src="/img/library.svg" alt="" />
-            <span>Your library</span>
+            <NavLink to="/music/library">
+              <span>Your library</span>
+            </NavLink>
           </div>
           <div className="flex gap-2">
             <div onClick={() => setAlbumSongs(null)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">

@@ -1,9 +1,11 @@
-import React, { useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 
 export default function Nav() {
-  const { isLoggedIn, setIsLoggedIn, user, setUser } = useLoginCheck();
+  const { isLoggedIn, setIsLoggedIn, user, setUser, searchBar, setSearchBar } = useLoginCheck();
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
@@ -24,8 +26,50 @@ export default function Nav() {
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (query.trim() !== "") {
+      onSearch(query.trim());
+    }
+  };
+
   return (
-    <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2">
+    <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2 relative">
+      {searchBar && <div className="absolute left-10">
+        <form
+          onSubmit={handleSubmit}
+          className="flex items-center bg-gray-800 rounded-full px-4 py-2 w-full max-w-md mx-auto shadow-md"
+        >
+          <img
+            src="/img/search.svg"
+            alt="Search"
+            className="w-5 h-5 invert opacity-70"
+          />
+          <input
+            type="text"
+            placeholder="Search songs..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="bg-transparent text-white placeholder-gray-400 outline-none ml-3 w-full"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="text-gray-400 hover:text-white ml-2"
+            >
+              ✕
+            </button>
+          )}
+          <button
+              type="button"
+              onClick={() => {setSearchBar(false); navigate("/")}}
+              className="text-gray-400 hover:text-white ml-2"
+            >
+              ✕
+            </button>
+        </form>
+      </div>}
       <div className="flex items-center gap-4 relative">
         {isLoggedIn ? (
           <>

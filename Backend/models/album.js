@@ -4,6 +4,7 @@ const albumSchema = mongoose.Schema({
   title: {type: String, required: [true, "Album title required."]},
   description: {type: String},
   artistId: {type: mongoose.Schema.Types.ObjectId},
+  artistName: {type: String, required: [true, "Artist name is required."]},
   coverPhoto: {type: String,  required: [true, "Cover Photo is required."]},
   songs: [
     {

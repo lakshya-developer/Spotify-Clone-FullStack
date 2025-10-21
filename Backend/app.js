@@ -73,7 +73,7 @@ app.use((req, res, next) => {
   next();
 });
 
-import authRouter from "./Routes/auth.Routes.js";
+import authRouter from "./Routes/auth.Routes.js"
 import MusicRouter from "./Routes/Music.Route.js"
 
 // app.get('/' , routeController.getHome)

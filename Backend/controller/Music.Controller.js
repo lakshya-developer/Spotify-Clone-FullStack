@@ -88,10 +88,16 @@ export const postAlbumAdd = async (req, res, next) => {
       console.log(cloudinaryResponse);
     }
 
+    const user = await User.findById(userId);
+    if(!user){
+      res.status(404).json({message: "User does not Exist."})
+    }
+
     const album = await new Album({
       title: title,
       description: description,
       artistId: userId,
+      artistName: (user.firstName + " " +user.lastName),
       coverPhoto: albumCoverPhotoUrl,
     });
     await album.save();
@@ -318,11 +324,15 @@ export const postLikeSong = async (req, res, next) => {
     if(!user){
       res.status(404).json({message: "User does not exist."});
     }
+    const alreadyExist = await User.findOne({_id: userId, likedSongs: songId,});
+    if(alreadyExist){
+      res.status(200).json({message: "Song Already Liked."});
+    }
     const song = await Songs.findById(songId);
     if(!song){
       res.status(404).json({message: "Song does not exist."})
     }
-    await User.updateOne({_id: userId},{$set: {likedSongs: songId}});
+    await User.updateOne({_id: userId},{$push: {likedSongs: songId}});
     await Songs.updateOne({_id: songId}, {$set: {likes: (song.likes + 1)}})
     res.status(200).json({message: "Song Liked"});
   } catch (error) {
@@ -337,11 +347,15 @@ export const postLikeAlbum = async (req, res, next) => {
     if(!user){
       res.status(404).json({message: "User does not exist."});
     }
+    const alreadyExist = await User.findOne({_id: userId, likedAlbums: albumId,})
+    if(alreadyExist){
+      res.status(200).json({message: "Album already liked."})
+    }
     const album = await Album.findById(albumId);
     if(!album){
       res.status(404).json({message: "Song does not exist."})
     }
-    await User.updateOne({_id: userId},{$set: {likedAlbums: albumId}});
+    await User.updateOne({_id: userId},{$push: {likedAlbums: albumId}});
     await Songs.updateOne({_id: songId}, {$set: {likes: (album.likes + 1)}})
     res.status(200).json({message: "Song Liked"});
   } catch (error) {

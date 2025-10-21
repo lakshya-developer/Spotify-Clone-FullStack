@@ -5,7 +5,7 @@ import { useLoginCheck } from "../context/LoginContext";
 import Nav from "./nav/Nav";
 import { usePlayBarContext } from "../context/PlayBarContext";
 import { useAlbumLoadContext } from "../context/AlbumLoadContext";
-import { likeSong } from "./Functions/likeSong";
+import { likeSong, likeAlbum } from "./Functions/likeFunction";
 
 export default function RightSide() {
   const [homeContent, setHomeContent] = useState({
@@ -17,8 +17,7 @@ export default function RightSide() {
   const { songLoad } = useAlbumLoadContext();
   // This tracks which song’s menu is open
   const [openMenuId, setOpenMenuId] = useState(null);
-  const {user} = useLoginCheck();
-  
+  const { user } = useLoginCheck();
 
   const cards = [
     { title: "Today's Top Hits" },
@@ -101,91 +100,84 @@ export default function RightSide() {
                 //     <img className="w-3 cursor-pointer" src="/img/newplay.svg" alt="Play" />
                 //   </button>
                 // </div>
-                <div className="flex flex-col gap-3">
-                    <div
-                      key={song._id}
-                      className="card-hover bg-gray-800 p-4 pr-5 rounded-lg transition-all duration-300 relative group flex items-center gap-4"
+                <div key={song._id} className="flex flex-col gap-3">
+                  <div className="card-hover bg-gray-800 p-4 pr-5 rounded-lg transition-all duration-300 relative group flex items-center gap-4">
+                    {/* --- Song Image --- */}
+                    <div className="w-10 h-10 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                      <img
+                        src={song.coverPhoto || "/img/default-album.png"}
+                        alt={song.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* --- Song Info --- */}
+                    <div className="flex-grow overflow-hidden">
+                      <h3 className="text-white font-medium mb-1 truncate">
+                        {song.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm truncate">
+                        {song.artist}
+                      </p>
+                    </div>
+
+                    {/* --- Play Button --- */}
+                    <div></div>
+                    <button
+                      onClick={() => PlaySong(song._id, "song")}
+                      className="play-button w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-10 bottom-0 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-1.6rem] translate-y-0 cursor-pointer"
                     >
-                      {/* --- Song Image --- */}
-                      <div className="w-10 h-10 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
-                        <img
-                          src={song.coverPhoto || "/img/default-album.png"}
-                          alt={song.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
+                      <img
+                        className="w-3 cursor-pointer"
+                        src="/img/newplay.svg"
+                        alt="Play"
+                      />
+                    </button>
 
-                      {/* --- Song Info --- */}
-                      <div className="flex-grow overflow-hidden">
-                        <h3 className="text-white font-medium mb-1 truncate">
-                          {song.title}
-                        </h3>
-                        <p className="text-gray-400 text-sm truncate">
-                          {song.artist}
-                        </p>
-                      </div>
-
-                      {/* --- Play Button --- */}
-                      <div>
-
-                      </div>
+                    {/* --- 3-dot Menu Button --- */}
+                    <div className="relative">
                       <button
-                        onClick={() => PlaySong(song._id, "song")}
-                        className="play-button w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-10 bottom-0 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-1.6rem] translate-y-0 cursor-pointer"
+                        onClick={() =>
+                          setOpenMenuId(
+                            openMenuId === song._id ? null : song._id
+                          )
+                        }
+                        className="text-gray-400 hover:text-white transition"
                       >
-                        <img
-                          className="w-3 cursor-pointer"
-                          src="/img/newplay.svg"
-                          alt="Play"
-                        />
+                        <EllipsisVertical size={20} />
                       </button>
 
-                      {/* --- 3-dot Menu Button --- */}
-                      <div className="relative">
-                        <button
-                          onClick={() =>
-                            setOpenMenuId(
-                              openMenuId === song._id ? null : song._id
-                            )
-                          }
-                          className="text-gray-400 hover:text-white transition"
+                      {openMenuId === song._id && (
+                        <div
+                          className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
+                          onMouseLeave={() => setOpenMenuId(null)}
                         >
-                          <EllipsisVertical size={20} />
-                        </button>
-
-                        {openMenuId === song._id && (
-                          <div
-                            className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
-                            onMouseLeave={() => setOpenMenuId(null)}
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            onClick={() => likeSong(user.id, song._id)}
                           >
-                            <button
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                              onClick={() =>
-                                likeSong(user._id,song._id)
-                              }
-                            >
-                              ❤️ Like
-                            </button>
-                            <button
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                              onClick={() =>
-                                console.log(`Favorited: ${song.title}`)
-                              }
-                            >
-                              ⭐ Favorite
-                            </button>
-                            <button
-                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                              onClick={() =>
-                                console.log(`Add to Playlist: ${song.title}`)
-                              }
-                            >
-                              ➕ Add to Playlist
-                            </button>
-                          </div>
-                        )}
-                      </div>
+                            ❤️ Like
+                          </button>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            onClick={() =>
+                              console.log(`Favorited: ${song.title}`)
+                            }
+                          >
+                            ⭐ Favorite
+                          </button>
+                          <button
+                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                            onClick={() =>
+                              console.log(`Add to Playlist: ${song.title}`)
+                            }
+                          >
+                            ➕ Add to Playlist
+                          </button>
+                        </div>
+                      )}
                     </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -210,8 +202,43 @@ export default function RightSide() {
                 <h3 className="text-white font-medium mb-1 truncate">
                   {album.title}
                 </h3>
-                <p className="text-gray-400 text-sm">Album</p>
-                <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
+                <div className="flex justify-between">
+                  <p className="text-gray-400 text-sm"> {album.artistName } </p>
+                  <div className="relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(
+                          openMenuId === album._id ? null : album._id
+                        );
+                      }}
+                      className="text-gray-400 hover:text-white transition"
+                    >
+                      <EllipsisVertical size={20} />
+                    </button>
+
+                    {openMenuId === album._id && (
+                      <div
+                        className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
+                        onMouseLeave={() => setOpenMenuId(null)}
+                      >
+                        {/* <button
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                          onClick={() => likeAlbum(user.id, album._id)}
+                        >
+                          ❤️ Like
+                        </button> */}
+                        <button
+                          className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                          onClick={() => console.log(`Favorited: `)}
+                        >
+                          ⭐ Favorite
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-16 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
                   <img className="w-4" src="/img/newplay.svg" alt="Play" />
                 </button>
               </div>
@@ -219,7 +246,7 @@ export default function RightSide() {
           </div>
         </div>
         <div className="flex-1 p-4 ">
-          <h2 className="text-2xl font-bold mb-6">Spotify Albums</h2>
+          <h2 className="text-2xl font-bold mb-6">Spotify Artists</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             {homeContent.artists?.map((artist) => (
               <div

@@ -14,6 +14,7 @@ const LoginContext = createContext({
 function LoginProvider({children}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [ searchBar, setSearchBar ] = useState(false);
 
   const checkAuthStatus = async () => {
     try {
@@ -46,7 +47,9 @@ function LoginProvider({children}) {
       setIsLoggedIn,
       user,
       setUser,
-      checkAuthStatus
+      checkAuthStatus,
+      searchBar,
+      setSearchBar
     }}>
       {children}
     </LoginContext.Provider>
