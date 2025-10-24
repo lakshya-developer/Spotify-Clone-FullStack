@@ -6,8 +6,8 @@ import { useLoginCheck } from "../context/LoginContext";
 
 export default function LeftSidebar() {
   const { setAlbumSongs } = useAlbumLoadContext();
-  const { setSearchBar } = useLoginCheck();
-  
+  const { searchBar, setSearchBar } = useLoginCheck();
+
   return (
     <div
       className="left-sidebar p-2 bg-black min-w-[220px] max-w-xs flex flex-col"
@@ -24,11 +24,27 @@ export default function LeftSidebar() {
         <ul className="bg-gray-800 text-gray-400 rounded-lg p-4 space-y-3">
           <li className="flex items-center gap-4 cursor-pointer hover:text-white transition-colors">
             <img className="invert w-6 h-8" src="/img/home.svg" alt="" />
-            <a href="/">Home</a>
+            <NavLink
+              to="/"
+              onClick={() => {
+                setSearchBar(false);
+                console.log(searchBar);
+              }}
+            >
+              Home
+            </NavLink>
           </li>
           <li className="flex items-center gap-4 cursor-pointer hover:text-white transition-colors">
             <img className="invert w-6 h-8" src="/img/search.svg" alt="" />
-            <a href="/music/search" onClick={() => setSearchBar(true)}>Search</a>
+            <NavLink
+              to="/music/search"
+              // onClick={() => {
+              //   setSearchBar(true);
+              //   console.log(searchBar);
+              // }}
+            >
+              Search
+            </NavLink>
           </li>
         </ul>
       </div>
@@ -41,8 +57,15 @@ export default function LeftSidebar() {
             </NavLink>
           </div>
           <div className="flex gap-2">
-            <div onClick={() => setAlbumSongs(null)} className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">
-              <img className="invert w-6 h-8" src="https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039805/close_vm8fhk.svg" alt="" />
+            <div
+              onClick={() => setAlbumSongs(null)}
+              className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors"
+            >
+              <img
+                className="invert w-6 h-8"
+                src="https://res.cloudinary.com/dw0ehvbnr/image/upload/v1759039805/close_vm8fhk.svg"
+                alt=""
+              />
             </div>
             <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 cursor-pointer transition-colors">
               <img

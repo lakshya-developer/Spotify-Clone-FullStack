@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
+import { useSearchBarContext } from "../../context/SearchBarContext";
 
 export default function Nav() {
-  const { isLoggedIn, setIsLoggedIn, user, setUser, searchBar, setSearchBar } = useLoginCheck();
+  const { isLoggedIn, setIsLoggedIn, user, setUser } = useLoginCheck();
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const {searchBar, setSearchBar} = useSearchBarContext();
 
   const handleLogout = async () => {
     try {
@@ -35,7 +37,7 @@ export default function Nav() {
 
   return (
     <div className="bg-gray-800 h-20 flex items-center justify-end px-6 rounded-lg m-2 relative">
-      {searchBar && <div className="absolute left-10">
+      {searchBar ? ( <div className="absolute left-10">
         <form
           onSubmit={handleSubmit}
           className="flex items-center bg-gray-800 rounded-full px-4 py-2 w-full max-w-md mx-auto shadow-md"
@@ -69,7 +71,7 @@ export default function Nav() {
               ✕
             </button>
         </form>
-      </div>}
+      </div>) : null}
       <div className="flex items-center gap-4 relative">
         {isLoggedIn ? (
           <>

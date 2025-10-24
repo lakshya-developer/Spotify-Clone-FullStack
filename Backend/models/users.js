@@ -11,7 +11,8 @@ const userSchema = mongoose.Schema({
   playlist: [
     {
       name: { type: String },
-      songs: { type: mongoose.Schema.Types.ObjectId, ref: "Songs" },
+      cover: { type: String, default: ""},
+      songs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Songs" }],
     },
   ],
   likedSongs: [{ type: mongoose.Schema.Types.ObjectId, ref: "Songs" }],

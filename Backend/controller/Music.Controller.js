@@ -8,7 +8,7 @@ export const postSongAdd = async (req, res, next) => {
   console.log("Title:", title);
 
   if ([title].some((feild) => feild?.trim() === "")) {
-    res.status(400).json({ message: "Feilds cannot be empty." });
+    return res.status(400).json({ message: "Feilds cannot be empty." });
   }
 
   let audioLocalPath = "";
@@ -20,14 +20,16 @@ export const postSongAdd = async (req, res, next) => {
   }
 
   if (!coverLocalPath) {
-    res.status(400).json({ message: "Cover Image required." });
+    return res.status(400).json({ message: "Cover Image required." });
   }
 
   const audioFile = await uploadOnCloudinary(audioLocalPath);
   const coverPhoto = await uploadOnCloudinary(coverLocalPath);
 
   if (!audioFile) {
-    res.status(400).json({ message: "Audio file could'nt upload properly." });
+    return res
+      .status(400)
+      .json({ message: "Audio file could'nt upload properly." });
   }
 
   const user = await User.findById(userId);
@@ -61,14 +63,14 @@ export const postAlbumAdd = async (req, res, next) => {
   console.log("Album Title:", title);
 
   if (title.trim() === "") {
-    res.status(400).json({ message: "Feilds cannot be empty." });
+    return res.status(400).json({ message: "Feilds cannot be empty." });
   }
 
   try {
     const exist = await Album.findOne({ title: title });
 
     if (exist) {
-      res.status(400).json({ message: "Named title already esist." });
+      return res.status(400).json({ message: "Named title already esist." });
     }
 
     let albumCoverPhotoUrl = "";
@@ -80,7 +82,7 @@ export const postAlbumAdd = async (req, res, next) => {
         albumCoverPhotoLocalPath
       );
       if (!cloudinaryResponse) {
-        res.status(500).json({
+        return res.status(500).json({
           message: "There was an error while uploading files on Cloudinary.",
         });
       }
@@ -89,15 +91,15 @@ export const postAlbumAdd = async (req, res, next) => {
     }
 
     const user = await User.findById(userId);
-    if(!user){
-      res.status(404).json({message: "User does not Exist."})
+    if (!user) {
+      return res.status(404).json({ message: "User does not Exist." });
     }
 
     const album = await new Album({
       title: title,
       description: description,
       artistId: userId,
-      artistName: (user.firstName + " " +user.lastName),
+      artistName: user.firstName + " " + user.lastName,
       coverPhoto: albumCoverPhotoUrl,
     });
     await album.save();
@@ -112,7 +114,7 @@ export const postAlbumAdd = async (req, res, next) => {
         .json({ message: "There was an error while adding Album." });
     }
 
-    res.status(201).json({ addAlbum });
+    return res.status(201).json({ addAlbum });
   } catch (err) {
     console.log("Error Occrured:", err);
   }
@@ -124,14 +126,14 @@ export const getArtistSongs = async (req, res, next) => {
   const user = await User.findById(userId);
 
   if (!user) {
-    res.status(400).json({ message: "Artist does not exist." });
+    return res.status(400).json({ message: "Artist does not exist." });
   }
 
   const songs = await Songs.find({ artistId: userId });
   const albums = await Album.find({ artistId: userId });
 
   if (!songs || !albums) {
-    res.status(500).json({ message: "Error while fetching the data." });
+    return res.status(500).json({ message: "Error while fetching the data." });
   }
 
   res.status(200).json({ songs, albums });
@@ -139,14 +141,14 @@ export const getArtistSongs = async (req, res, next) => {
 
 export const getMusic = async (req, res, next) => {
   // if(!req.session.isLoggedin){
-  //   res.status(400).json({ message: "User is not logged in."});
+  //return res.status(400).json({ message: "User is not logged in."});
   // }
 
   const songs = await Songs.find();
   const albums = await Album.find();
 
   if (!songs || !albums) {
-    res.status(500).json({ message: "Error while fetching the data." });
+    return res.status(500).json({ message: "Error while fetching the data." });
   }
 
   res.status(200).json({ songs, albums });
@@ -159,21 +161,21 @@ export const getMusicInfo = async (req, res, next) => {
     if (type === "song") {
       const song = await Songs.findById(id);
       if (!song) {
-        res.status(400).json({ message: "Something went wrong." });
+        return res.status(400).json({ message: "Something went wrong." });
       }
-      res.status(200).json(song);
+      return res.status(200).json(song);
     } else if (type === "album") {
       const album = await Album.findById(id).populate("songs");
       if (!album) {
-        res.status(400).json({ message: "Something went wrong." });
+        return res.status(400).json({ message: "Something went wrong." });
       }
-      res.status(200).json(album);
+      return res.status(200).json(album);
     } else {
-      res.status(404).json({ message: "No such type data exist." });
+      return res.status(404).json({ message: "No such type data exist." });
     }
   } catch (error) {
     console.log("An Error Occured", error);
-    res.status(500).json({ message: "Error Occured" });
+    return res.status(500).json({ message: "Error Occured" });
   }
 };
 
@@ -182,7 +184,7 @@ export const addToAlbum = async (req, res, next) => {
   console.log("Title:", title);
 
   if ([title].some((feild) => feild?.trim() === "")) {
-    res.status(400).json({ message: "Feilds cannot be empty." });
+    return res.status(400).json({ message: "Feilds cannot be empty." });
   }
 
   let audioLocalPath = "";
@@ -194,14 +196,16 @@ export const addToAlbum = async (req, res, next) => {
   }
 
   if (!coverLocalPath) {
-    res.status(400).json({ message: "Cover Image required." });
+    return res.status(400).json({ message: "Cover Image required." });
   }
 
   const audioFile = await uploadOnCloudinary(audioLocalPath);
   const coverPhoto = await uploadOnCloudinary(coverLocalPath);
 
   if (!audioFile) {
-    res.status(400).json({ message: "Audio file could'nt upload properly." });
+    return res
+      .status(400)
+      .json({ message: "Audio file could'nt upload properly." });
   }
 
   const user = await User.findById(userId);
@@ -242,7 +246,7 @@ export const addToAlbum = async (req, res, next) => {
   console.log(updatedAlbum);
 
   if (!album) {
-    res.status(404).json({ message: "Album not found." });
+    return res.status(404).json({ message: "Album not found." });
   }
 
   const addedSong = await Songs.findById(song._id).select(
@@ -268,7 +272,7 @@ export const getArtistsInfo = async (req, res, next) => {
         .status(500)
         .json({ message: "There was an error retriving the Artists data." });
     }
-    res.status(200).json(artists);
+    return res.status(200).json(artists);
   } catch (error) {
     console.log("Error Occured:", error);
   }
@@ -280,85 +284,163 @@ export const getUserMusicData = async (req, res, next) => {
     if (type === "songs") {
       const user = await User.findById(userId).populate("likedSongs");
       if (!user) {
-        res.status(404).json({ message: "User does not exist." });
+        return res.status(404).json({ message: "User does not exist." });
       }
       const songs = user.likedSongs;
-      res.status(200).json(songs);
+      return res.status(200).json(songs);
     } else if (type === "playlist") {
       const user = await User.findById(userId).populate("playlist");
-      if(!user){
-        res.status(404).json({message: "User does not exist."});
+      if (!user) {
+        return res.status(404).json({ message: "User does not exist." });
       }
       const playlist = user.playlist;
-      res.status(200).json(playlist);
+      return res.status(200).json(playlist);
     } else if (type === "album") {
       const user = await User.findById(userId).populate("likedAlbums");
-      if(!user){
-        res.status(404).json({message: "User does not exist."})
+      if (!user) {
+        return res.status(404).json({ message: "User does not exist." });
       }
       const albums = user.likedAlbums;
-      res.stauts(200).json(albums);
+      return res.stauts(200).json(albums);
     }
-    if(type === "all"){
+    if (type === "all") {
       const userSongs = await User.findById(userId).populate("likedSongs");
       if (!userSongs) {
-        res.status(404).json({ message: "User does not exist." });
+        return res.status(404).json({ message: "User does not exist." });
       }
       const userPlaylist = await User.findById(userId).populate("playlist");
       const userAlbums = await User.findById(userId).populate("likedAlbums");
       const songs = userSongs.likedSongs;
       const playlist = userPlaylist.playlist;
       const albums = userAlbums.likedAlbums;
-      res.status(200).json({songs, playlist, albums});
+      return res.status(200).json({ songs, playlist, albums });
     }
   } catch (err) {
     console.log("Error Occured:", err);
   }
 };
 
-
 export const postLikeSong = async (req, res, next) => {
   const { userId, songId } = req.body;
   try {
     const user = await User.findById(userId);
-    if(!user){
-      res.status(404).json({message: "User does not exist."});
+    if (!user) {
+      return res.status(404).json({ message: "User does not exist." });
     }
-    const alreadyExist = await User.findOne({_id: userId, likedSongs: songId,});
-    if(alreadyExist){
-      res.status(200).json({message: "Song Already Liked."});
+    const alreadyExist = await User.findOne({
+      _id: userId,
+      likedSongs: songId,
+    });
+    if (alreadyExist) {
+      return res.status(200).json({ message: "Song Already Liked." });
     }
     const song = await Songs.findById(songId);
-    if(!song){
-      res.status(404).json({message: "Song does not exist."})
+    if (!song) {
+      return res.status(404).json({ message: "Song does not exist." });
     }
-    await User.updateOne({_id: userId},{$push: {likedSongs: songId}});
-    await Songs.updateOne({_id: songId}, {$set: {likes: (song.likes + 1)}})
-    res.status(200).json({message: "Song Liked"});
+    await User.updateOne({ _id: userId }, { $push: { likedSongs: songId } });
+    await Songs.updateOne({ _id: songId }, { $set: { likes: song.likes + 1 } });
+    return res.status(200).json({ message: "Song Liked" });
   } catch (error) {
     console.log("Error Occured:", error);
   }
-}
+};
 
 export const postLikeAlbum = async (req, res, next) => {
   const { userId, albumId } = req.body;
   try {
     const user = await User.findById(userId);
-    if(!user){
-      res.status(404).json({message: "User does not exist."});
+    if (!user) {
+      return res.status(404).json({ message: "User does not exist." });
     }
-    const alreadyExist = await User.findOne({_id: userId, likedAlbums: albumId,})
-    if(alreadyExist){
-      res.status(200).json({message: "Album already liked."})
+    const alreadyExist = await User.findOne({
+      _id: userId,
+      likedAlbums: albumId,
+    });
+    if (alreadyExist) {
+      return res.status(200).json({ message: "Album already liked." });
     }
     const album = await Album.findById(albumId);
-    if(!album){
-      res.status(404).json({message: "Song does not exist."})
+    if (!album) {
+      return res.status(404).json({ message: "Song does not exist." });
     }
-    await User.updateOne({_id: userId},{$push: {likedAlbums: albumId}});
-    await Songs.updateOne({_id: songId}, {$set: {likes: (album.likes + 1)}})
-    res.status(200).json({message: "Song Liked"});
+    await User.updateOne({ _id: userId }, { $push: { likedAlbums: albumId } });
+    await Songs.updateOne(
+      { _id: songId },
+      { $set: { likes: album.likes + 1 } }
+    );
+    return res.status(200).json({ message: "Song Liked" });
   } catch (error) {
     console.log("Error Occured:", error);
+  }
+};
+
+export const createPlaylist = async (req, res, next) => {
+  const { userId, title } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User does not exist." });
+    }
+    const alreadyExist = await User.findOne({
+      _id: userId,
+      playlist: { $elemMatch: { name: title } },
+    });
+    if (alreadyExist) {
+      return res.status(400).json({ message: "Playlist already exist." });
+    }
+    user.playlist.push({ name: title });
+    await user.save();
+    return res.status(201).json({ message: "Playlist created." });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const addToPlaylist = async (req, res, next) => {
+  const { userId, playlistName, songId } = req.body;
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User does not exist." });
+    }
+    const alreadyExist = await User.findOne({
+      _id: userId,
+      playlist: {
+        $elemMatch: {
+          name: playlistName,
+          songs: songId, // checks if this songId exists in the songs array
+        },
+      },
+    });
+    if (alreadyExist) {
+      return res
+        .status(400)
+        .json({ message: "Song already exist in Playlist." });
+    }
+    const playlist = user.playlist.find((p) => p.name === playlistName);
+
+    if (!playlist.songs.includes(songId)) {
+      playlist.songs.push(songId);
+      await user.save();
+      console.log("Song added!");
+    }
+    return res.status(200).json({ message: "Song added to playlist." });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const playlistSongs = async (req, res, next) => {
+  const { userId } = req.body;
+  try {
+    const user = await User.findOne({_id: userId}).populate("playlist.songs");
+    if(!user){
+      return res.status(404).json({ message: "User does not exist." });
+    }
+    const songs = user.playlist;
+    return res.status(200).json(songs);
+  } catch (error) {
+    console.log(error);
   }
 }

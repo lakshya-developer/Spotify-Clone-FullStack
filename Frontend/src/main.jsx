@@ -16,11 +16,12 @@ import {
   AddMusic,
   YourMusic,
   Library,
-  Search
+  Search,
 } from "./components";
 import { LoginProvider } from "./context/LoginContext.jsx";
 import { PlayBarProvider } from "./context/PlayBarContext.jsx";
 import { AlbumLoadProvider } from "./context/AlbumLoadContext.jsx";
+import { SearchBarProvider } from "./context/SearchBarContext.jsx";
 import ProtectedRoute from "./protectedRooutes/ProtectedRoute.jsx";
 
 const router = createBrowserRouter(
@@ -39,7 +40,7 @@ const router = createBrowserRouter(
         <Route path="add-music" element={<AddMusic />}></Route>
         <Route path="your-music" element={<YourMusic />}></Route>
         <Route path="library" element={<Library />}></Route>
-        <Route path="search" element={<Search />} ></Route>
+        <Route path="search" element={<Search />}></Route>
       </Route>
       <Route path="sign-up" element={<SignUp />}></Route>
       <Route path="login" element={<Login />}></Route>
@@ -51,9 +52,11 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <LoginProvider>
       <PlayBarProvider>
-        <AlbumLoadProvider>
-          <RouterProvider router={router} />
-        </AlbumLoadProvider>
+        <SearchBarProvider>
+          <AlbumLoadProvider>
+            <RouterProvider router={router} />
+          </AlbumLoadProvider>
+        </SearchBarProvider>
       </PlayBarProvider>
     </LoginProvider>
   </StrictMode>

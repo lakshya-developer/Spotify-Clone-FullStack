@@ -1,27 +1,23 @@
+import { useEffect } from "react";
 import { useLoginCheck } from "../context/LoginContext"
 import { useNavigate } from "react-router-dom";
+import HomeLoading from "../components/ui/HomeLoading"
 
 const ProtectedRoute = ({ children }) => {
-  const { isLoggedIn } =  useLoginCheck();
+  const { isLoggedIn, isLoading } =  useLoginCheck();
   const navigate = useNavigate();
 
-  if(!isLoggedIn){
-    navigate("/login");
+  useEffect(() => {
+    // only redirect once loading is done
+    if (!isLoading && !isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, isLoading, navigate]);
+
+  // Show loading screen while checking login status
+  if (isLoading) {
+    return <HomeLoading />;
   }
-
-  // useEffect(() => {
-
-  //   // Prevent browser caching for this page
-  //   const noCacheHeaders = () => {
-  //     window.history.replaceState(null, "", window.location.href);
-  //   };
-  //   noCacheHeaders();
-  //   window.addEventListener("popstate", noCacheHeaders);
-
-  //   return () => {
-  //     window.removeEventListener("popstate", noCacheHeaders);
-  //   };
-  // }, [isLoggedIn, navigate]);
 
   return isLoggedIn ? children : null;
 }

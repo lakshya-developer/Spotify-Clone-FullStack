@@ -6,18 +6,22 @@ import Nav from "./nav/Nav";
 import { usePlayBarContext } from "../context/PlayBarContext";
 import { useAlbumLoadContext } from "../context/AlbumLoadContext";
 import { likeSong, likeAlbum } from "./Functions/likeFunction";
+import HomeLoading from "./ui/HomeLoading";
+import { addToPlaylist } from "./Functions/playlist";
 
 export default function RightSide() {
+  const { isLoading, user } = useLoginCheck();
+  const { songLoad } = useAlbumLoadContext();
+  const { PlaySong } = usePlayBarContext();
   const [homeContent, setHomeContent] = useState({
     songs: [],
     albums: [],
     artists: [],
   });
-  const { PlaySong } = usePlayBarContext();
-  const { songLoad } = useAlbumLoadContext();
+  const [playlists, setPlaylists] = useState([]);
   // This tracks which song’s menu is open
   const [openMenuId, setOpenMenuId] = useState(null);
-  const { user } = useLoginCheck();
+  const [showPlaylistMenu, setShowPlaylistMenu] = useState();
 
   const cards = [
     { title: "Today's Top Hits" },
@@ -26,9 +30,9 @@ export default function RightSide() {
     { title: "Rock Classics" },
     { title: "Chill Hits" },
   ];
+  
 
   useEffect(() => {
-    // TODO: Replace with actual API calls
     const fetchUserContent = async () => {
       try {
         const response = await fetch(
@@ -55,224 +59,231 @@ export default function RightSide() {
         console.error("Error fetching user content:", error);
       }
     };
+    const fetchUserMusicData = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:3000/api/music/getUserMusicData",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId: user.id, type: "all" }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setPlaylists(data.playlist);
+        }
+      } catch (err) {
+        console.log("Error Occurred:", err);
+      }
+    };
+
+    fetchUserMusicData();
 
     fetchUserContent();
-  }, []);
+  }, [isLoading]);
 
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">
       <Nav />
 
-      {/* Main Content */}
-      <div className="flex-1 p-4 overflow-y-auto">
-        <div className="flex-1 p-4 ">
-          <h2 className="text-2xl font-bold">Spotify Songs</h2>
-          <div className=" p-8 ">
-            {/* --- Grid is now 4 columns --- */}
-            <div className="grid grid-cols-4 gap-4">
-              {homeContent.songs?.map((song) => (
-                // <div
-                //   key={song._id}
-                //   // --- Card is now a flex container for horizontal layout ---
-                //   className="card-hover bg-gray-800 p-4 pr-5 rounded-lg transition-all duration-300 relative group flex items-center gap-4"
-                // >
-                //   {/* --- Image is smaller and has a fixed size --- */}
-                //   <div className="w-10 h-10 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
-                //     <img
-                //       src={song.coverPhoto || "/img/default-album.png"}
-                //       alt={song.title}
-                //       className="w-full h-full object-cover"
-                //     />
-                //   </div>
+      {isLoading ? (
+        <HomeLoading />
+      ) : (
+        // ✅ Main Content should be inside parentheses only
+        <div className="flex-1 p-4 overflow-y-auto">
+          <div className="flex-1 p-4">
+            <h2 className="text-2xl font-bold">Spotify Songs</h2>
+            <div className="p-8">
+              <div className="grid grid-cols-4 gap-4">
+                {homeContent.songs?.map((song) => (
+                  <div key={song._id} className="flex flex-col gap-3">
+                    <div className="card-hover bg-gray-800 p-4 pr-5 rounded-lg transition-all duration-300 relative group flex items-center gap-4">
+                      {/* Song Image */}
+                      <div className="w-10 h-10 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
+                        <img
+                          src={song.coverPhoto || "/img/default-album.png"}
+                          alt={song.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
 
-                //   {/* --- New div wrapping h3 and p for vertical alignment --- */}
-                //   <div className="flex-grow overflow-hidden">
-                //     <h3 className="text-white font-medium mb-1 truncate">
-                //       {song.title}
-                //     </h3>
-                //     <p className="text-gray-400 text-sm truncate">
-                //       Artist: {song.artist}
-                //     </p>
-                //   </div>
+                      {/* Song Info */}
+                      <div className="flex-grow overflow-hidden">
+                        <h3 className="text-white font-medium mb-1 truncate">
+                          {song.title}
+                        </h3>
+                        <p className="text-gray-400 text-sm truncate">
+                          {song.artist}
+                        </p>
+                      </div>
 
-                //   {/* --- Button is unchanged as per instructions --- */}
-                //   <button onClick={() => PlaySong(song._id, "song")} className="play-button w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-2 bottom-1 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-1.5rem] translate-y-0 cursor-pointer">
-                //     <img className="w-3 cursor-pointer" src="/img/newplay.svg" alt="Play" />
-                //   </button>
-                // </div>
-                <div key={song._id} className="flex flex-col gap-3">
-                  <div className="card-hover bg-gray-800 p-4 pr-5 rounded-lg transition-all duration-300 relative group flex items-center gap-4">
-                    {/* --- Song Image --- */}
-                    <div className="w-10 h-10 bg-gray-700 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={song.coverPhoto || "/img/default-album.png"}
-                        alt={song.title}
-                        className="w-full h-full object-cover"
-                      />
+                      {/* Play Button */}
+                      <button
+                        onClick={() => PlaySong(song._id, "song")}
+                        className="play-button w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-10 bottom-0 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-1.6rem] translate-y-0 cursor-pointer"
+                      >
+                        <img
+                          className="w-3 cursor-pointer"
+                          src="/img/newplay.svg"
+                          alt="Play"
+                        />
+                      </button>
+
+                      {/* 3-dot Menu */}
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            setOpenMenuId(
+                              openMenuId === song._id ? null : song._id
+                            )
+                          }
+                          className="text-gray-400 hover:text-white transition"
+                        >
+                          <EllipsisVertical size={20} />
+                        </button>
+
+                        {openMenuId === song._id && (
+                          <div
+                            className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
+                            onMouseLeave={() => setOpenMenuId(null)}
+                          >
+                            <button
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              onClick={() => likeSong(user.id, song._id)}
+                            >
+                              ❤️ Like
+                            </button>
+                            <button
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 relative"
+                              onMouseLeave={() => setShowPlaylistMenu(false)}
+                            >
+                              ⭐ Favorite
+                            </button>
+
+                            {/* Add to Playlist */}
+                            <div
+                              className="relative"
+                              onMouseEnter={() => setShowPlaylistMenu(true)}
+                              onMouseLeave={() => setShowPlaylistMenu(false)}
+                            >
+                              <button className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700">
+                                ➕ Add to Playlist
+                              </button>
+
+                              {showPlaylistMenu && (
+                                <div className="absolute left-full top-0 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 w-48 z-50" onMouseLeave={() => setShowPlaylistMenu(false)}>
+                                  {playlists?.map((pl) => (
+                                    <button
+                                      key={pl._id}
+                                      className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                                      onClick={() =>
+                                        addToPlaylist(
+                                          user.id,
+                                          pl.name,
+                                          song._id
+                                        )
+                                      }
+                                    >
+                                      {pl.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
-                    {/* --- Song Info --- */}
-                    <div className="flex-grow overflow-hidden">
-                      <h3 className="text-white font-medium mb-1 truncate">
-                        {song.title}
-                      </h3>
-                      <p className="text-gray-400 text-sm truncate">
-                        {song.artist}
-                      </p>
-                    </div>
-
-                    {/* --- Play Button --- */}
-                    <div></div>
-                    <button
-                      onClick={() => PlaySong(song._id, "song")}
-                      className="play-button w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-10 bottom-0 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-1.6rem] translate-y-0 cursor-pointer"
-                    >
-                      <img
-                        className="w-3 cursor-pointer"
-                        src="/img/newplay.svg"
-                        alt="Play"
-                      />
-                    </button>
-
-                    {/* --- 3-dot Menu Button --- */}
+          {/* Albums Section */}
+          <div className="flex-1 p-4">
+            <h2 className="text-2xl font-bold mb-6" onClick={() => console.log(user)}>Spotify Albums</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {homeContent.albums?.map((album) => (
+                <div
+                  onClick={() => songLoad(album._id)}
+                  key={album._id}
+                  className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
+                >
+                  <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                    <img
+                      src={album.coverPhoto || "/img/default-album.png"}
+                      alt={album.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="text-white font-medium mb-1 truncate">
+                    {album.title}
+                  </h3>
+                  <div className="flex justify-between">
+                    <p className="text-gray-400 text-sm">{album.artistName}</p>
                     <div className="relative">
                       <button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setOpenMenuId(
-                            openMenuId === song._id ? null : song._id
-                          )
-                        }
+                            openMenuId === album._id ? null : album._id
+                          );
+                        }}
                         className="text-gray-400 hover:text-white transition"
                       >
                         <EllipsisVertical size={20} />
                       </button>
 
-                      {openMenuId === song._id && (
+                      {openMenuId === album._id && (
                         <div
                           className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
                           onMouseLeave={() => setOpenMenuId(null)}
                         >
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                            onClick={() => likeSong(user.id, song._id)}
-                          >
-                            ❤️ Like
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                            onClick={() =>
-                              console.log(`Favorited: ${song.title}`)
-                            }
-                          >
+                          <button className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700">
                             ⭐ Favorite
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                            onClick={() =>
-                              console.log(`Add to Playlist: ${song.title}`)
-                            }
-                          >
-                            ➕ Add to Playlist
                           </button>
                         </div>
                       )}
                     </div>
                   </div>
+                  <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-16 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
+                    <img className="w-4" src="/img/newplay.svg" alt="Play" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Artists Section */}
+          <div className="flex-1 p-4">
+            <h2 className="text-2xl font-bold mb-6">Spotify Artists</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {homeContent.artists?.map((artist) => (
+                <div
+                  key={artist._id}
+                  className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
+                >
+                  <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                    <img
+                      src={artist.coverPhoto || "/img/default-album.png"}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h3 className="text-white font-medium mb-1 truncate">
+                    {artist.firstName + " " + artist.lastName}
+                  </h3>
+                  <p className="text-gray-400 text-sm">Artist</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        <div className="flex-1 p-4 ">
-          <h2 className="text-2xl font-bold mb-6">Spotify Albums</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {homeContent.albums?.map((album) => (
-              <div
-                onClick={() => songLoad(album._id)}
-                key={album._id}
-                className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
-              >
-                <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
-                  <img
-                    src={album.coverPhoto || "/img/default-album.png"}
-                    alt={album.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-white font-medium mb-1 truncate">
-                  {album.title}
-                </h3>
-                <div className="flex justify-between">
-                  <p className="text-gray-400 text-sm"> {album.artistName } </p>
-                  <div className="relative">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpenMenuId(
-                          openMenuId === album._id ? null : album._id
-                        );
-                      }}
-                      className="text-gray-400 hover:text-white transition"
-                    >
-                      <EllipsisVertical size={20} />
-                    </button>
-
-                    {openMenuId === album._id && (
-                      <div
-                        className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
-                        onMouseLeave={() => setOpenMenuId(null)}
-                      >
-                        {/* <button
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                          onClick={() => likeAlbum(user.id, album._id)}
-                        >
-                          ❤️ Like
-                        </button> */}
-                        <button
-                          className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                          onClick={() => console.log(`Favorited: `)}
-                        >
-                          ⭐ Favorite
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-16 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
-                  <img className="w-4" src="/img/newplay.svg" alt="Play" />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex-1 p-4 ">
-          <h2 className="text-2xl font-bold mb-6">Spotify Artists</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {homeContent.artists?.map((artist) => (
-              <div
-                onClick={() => songLoad(album._id)}
-                key={artist._id}
-                className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
-              >
-                <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
-                  <img
-                    src={artist.coverPhoto || "/img/default-album.png"}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-white font-medium mb-1 truncate">
-                  {artist.firstName + " " + artist.lastName}
-                </h3>
-                <p className="text-gray-400 text-sm">Artist</p>
-                {/* <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-12 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
-                    <img className="w-4" src="/img/newplay.svg" alt="Play" />
-                  </button> */}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

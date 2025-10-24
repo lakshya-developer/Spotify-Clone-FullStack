@@ -48,5 +48,8 @@ router.route("/getArtistsInfo").get(MusicController.getArtistsInfo);
 router.route("/getUserMusicData").post(MusicController.getUserMusicData);
 router.route("/likeSong").post(MusicController.postLikeSong);
 router.route("/likeAlbum").post(MusicController.postLikeAlbum);
+router.route("/createPlaylist").post(MusicController.createPlaylist);
+router.route("/addToPlaylist").post(MusicController.addToPlaylist);
+router.route("/playlistSongs").post(MusicController.playlistSongs);
 
 export default router;

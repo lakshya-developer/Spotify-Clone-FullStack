@@ -1,23 +1,17 @@
 import React, { useEffect, createContext, useContext, useState } from "react";
 
-const LoginContext = createContext({
-  isLoggedIn: false,
-  setIsLoggedIn: () => {},
-  user: null,
-  setUser: () => {},
-  isLoading: true,
-  error: null,
-});
+const LoginContext = createContext();
 
 // Provider Component
 
 function LoginProvider({children}) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
-  const [ searchBar, setSearchBar ] = useState(false);
+  const [ isLoading, setIsLoading ] = useState(true);
 
   const checkAuthStatus = async () => {
     try {
+      setIsLoading(true)
       const response = await fetch("http://localhost:3000/api/auth/checkAuth", {
         credentials: "include"
       });
@@ -26,6 +20,7 @@ function LoginProvider({children}) {
         const userData = await response.json();
         setIsLoggedIn(true);
         setUser(userData);
+        setIsLoading(false);
       } else {
         setIsLoggedIn(false);
         setUser(null);
@@ -44,12 +39,11 @@ function LoginProvider({children}) {
   return (
     <LoginContext.Provider value={{
       isLoggedIn,
+      isLoading,
       setIsLoggedIn,
       user,
       setUser,
       checkAuthStatus,
-      searchBar,
-      setSearchBar
     }}>
       {children}
     </LoginContext.Provider>

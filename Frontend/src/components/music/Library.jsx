@@ -6,6 +6,7 @@ import { useAlbumLoadContext } from "../../context/AlbumLoadContext";
 import { likeSong, likeAlbum } from "../Functions/likeFunction";
 import Nav from "../nav/Nav";
 import { useLoginCheck } from "../../context/LoginContext";
+import { createPlaylist, playlistSongs } from "../Functions/playlist";
 
 function Library() {
   const { user } = useLoginCheck();
@@ -19,6 +20,10 @@ function Library() {
   const { PlaySong } = usePlayBarContext();
   // This tracks which song’s menu is open
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [newPlaylistName, setNewPlaylistName] = useState("");
+  const [showNewPlaylistForm, setShowNewPlaylistForm] = useState(false);
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null); // new state for selected playlist
+  const [error, setError] = useState(null);
 
   const library = [
     {
@@ -51,20 +56,26 @@ function Library() {
   useEffect(() => {
     const fetchUserMusicData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/music/getUserMusicData", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ userId: user.id, type: "all" })
-        });
-  
+        const response = await fetch(
+          "http://localhost:3000/api/music/getUserMusicData",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId: user.id, type: "all" }),
+          }
+        );
+        if (error) {
+          alert(error);
+        }
         if (response.ok) {
           const data = await response.json();
-          setUserContent(prev => ({
+          const playlist = await playlistSongs(user.id);
+          setUserContent((prev) => ({
             ...prev,
             songs: data.songs,
-            playlist: data.playlist,
+            playlist: playlist,
             albums: data.albums,
           }));
         }
@@ -72,10 +83,9 @@ function Library() {
         console.log("Error Occurred:", err);
       }
     };
-  
+
     fetchUserMusicData();
-  }, []);
-  
+  }, [error]);
 
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">
@@ -154,12 +164,133 @@ function Library() {
             )}
 
             {selectedItem === "Playlists" && (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {userContent.playlist?.map((album) => (
+              <div className="flex flex-col gap-4 ">
+                {/* Add Playlist Button */}
+                <button
+                  onClick={() => setShowNewPlaylistForm(!showNewPlaylistForm)}
+                  className="w-48 p-2 bg-green-500 text-black font-semibold rounded hover:bg-green-400 transition"
+                  style={selectedPlaylist ? {display:"none"} : null}
+                >
+                  + Create New Playlist
+                </button>
+
+                {/* New Playlist Form */}
+                {showNewPlaylistForm && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      createPlaylist(
+                        user.id,
+                        newPlaylistName,
+                        setUserContent,
+                        setNewPlaylistName,
+                        setShowNewPlaylistForm,
+                        setError
+                      );
+                    }}
+                    className="flex gap-2 mt-2"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Playlist Name"
+                      value={newPlaylistName}
+                      onChange={(e) => setNewPlaylistName(e.target.value)}
+                      className="p-2 rounded bg-gray-700 text-white placeholder-gray-400 focus:outline-none flex-grow"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="p-2 bg-green-500 rounded text-black hover:bg-green-400 transition"
+                    >
+                      Add
+                    </button>
+                  </form>
+                )}
+
+                {/* Existing Playlists Grid */}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mt-4"  style={selectedPlaylist ? {display:"none"} : null} >
+                  {userContent.playlist?.map((playlist) => (
+                    <div
+                      key={playlist.name}
+                      onClick={() => setSelectedPlaylist(playlist)} // set selected playlist
+                      className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer hover:bg-gray-700"
+                    >
+                      <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
+                        <img
+                          src={playlist.cover || "/img/default-album.png"}
+                          alt={playlist.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <h3 className="text-white font-medium mb-1 truncate">
+                        {playlist.name}
+                      </h3>
+                      <p className="text-gray-400 text-sm">Your Playlist</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Songs of Selected Playlist */}
+                {selectedPlaylist && (
+                  <div className="mt-6">
+                    <button
+                      onClick={() => setSelectedPlaylist(null)}
+                      className="text-gray-400 hover:text-white mb-4"
+                    >
+                      ← Back to Playlists
+                    </button>
+                    <h2 className="text-white text-lg font-semibold mb-4">
+                      {selectedPlaylist.name} - Songs
+                    </h2>
+                    <div className="flex flex-col gap-3">
+                      {selectedPlaylist.songs?.map((song) => (
+                        <div
+                          key={song._id}
+                          className="bg-gray-800/40 hover:bg-gray-800/60 p-4 rounded-lg flex items-center group"
+                        >
+                          <div className="w-12 h-12 bg-gray-700 rounded overflow-hidden mr-4">
+                            <img
+                              src={song.coverPhoto || "/img/default-song.png"}
+                              alt={song.title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-grow">
+                            <h3 className="text-white font-medium">
+                              {song.title}
+                            </h3>
+                            <p className="text-gray-400 text-sm">
+                              {song.artist}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => PlaySong(song._id, "song")}
+                            className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <img
+                              className="w-4"
+                              src="/img/newplay.svg"
+                              alt="Play"
+                            />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {selectedItem === "Favourate" && (
+              <div className="flex flex-col gap-3">
+                <h2 className="text-white text-lg font-semibold mb-4">
+                  Liked Albums
+                </h2>
+                {userContent.albums?.map((album) => (
                   <div
+                    onClick={() => songLoad(album._id)}
                     key={album._id}
-                    onClick={() => ""}
-                    className="card-hover bg-gray-800 p-4 rounded-lg cursor-pointer hover:bg-gray-700"
+                    className="card-hover w-50 bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
                   >
                     <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
                       <img
@@ -171,73 +302,46 @@ function Library() {
                     <h3 className="text-white font-medium mb-1 truncate">
                       {album.title}
                     </h3>
-                    <p className="text-gray-400 text-sm">Your Playlist</p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {selectedItem === "Favourate" && (
-              <div className="flex flex-col gap-3">
-                <h2 className="text-white text-lg font-semibold mb-4">
-                  Liked Albums
-                </h2>
-                {userContent.albums?.map((album) => (
-                  <div
-                  onClick={() => songLoad(album._id)}
-                  key={album._id}
-                  className="card-hover w-50 bg-gray-800 p-4 rounded-lg cursor-pointer transition-all duration-300 relative group"
-                >
-                  <div className="aspect-square bg-gray-700 rounded-lg mb-4 overflow-hidden">
-                    <img
-                      src={album.coverPhoto || "/img/default-album.png"}
-                      alt={album.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="text-white font-medium mb-1 truncate">
-                    {album.title}
-                  </h3>
-                  <div className="flex justify-between">
-                    <p className="text-gray-400 text-sm">Album </p>
-                    <div className="relative">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenMenuId(
-                            openMenuId === album._id ? null : album._id
-                          );
-                        }}
-                        className="text-gray-400 hover:text-white transition"
-                      >
-                        <EllipsisVertical size={20} />
-                      </button>
-  
-                      {openMenuId === album._id && (
-                        <div
-                          className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
-                          onMouseLeave={() => setOpenMenuId(null)}
+                    <div className="flex justify-between">
+                      <p className="text-gray-400 text-sm">Album </p>
+                      <div className="relative">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuId(
+                              openMenuId === album._id ? null : album._id
+                            );
+                          }}
+                          className="text-gray-400 hover:text-white transition"
                         >
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                            onClick={() => likeAlbum(user.id, album._id)}
+                          <EllipsisVertical size={20} />
+                        </button>
+
+                        {openMenuId === album._id && (
+                          <div
+                            className="absolute right-0 top-6 bg-gray-900 border border-gray-700 rounded-lg shadow-lg py-2 z-50 w-40"
+                            onMouseLeave={() => setOpenMenuId(null)}
                           >
-                            ❤️ Like
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
-                            onClick={() => console.log(`Favorited: `)}
-                          >
-                            ⭐ Favorite
-                          </button>
-                        </div>
-                      )}
+                            <button
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              onClick={() => likeAlbum(user.id, album._id)}
+                            >
+                              ❤️ Like
+                            </button>
+                            <button
+                              className="block w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700"
+                              onClick={() => console.log(`Favorited: `)}
+                            >
+                              ⭐ Favorite
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                    <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-16 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
+                      <img className="w-4" src="/img/newplay.svg" alt="Play" />
+                    </button>
                   </div>
-                  <button className="play-button w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-black font-bold hover:bg-green-400 transition-all duration-200 absolute right-5 bottom-16 opacity-0 group-hover:opacity-100 group-hover:translate-y-[-2rem] translate-y-0">
-                    <img className="w-4" src="/img/newplay.svg" alt="Play" />
-                  </button>
-                </div>
                 ))}
               </div>
             )}

@@ -62,7 +62,7 @@ function AlbumLoadProvider({ children }) {
         setCurrentSongIndex,
         albumSongPlay,
         selectedItem,
-        setSelectedItem
+        setSelectedItem,
       }}
     >
       {children}
