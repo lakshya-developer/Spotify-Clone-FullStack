@@ -79,11 +79,13 @@ export default function RightSide() {
         console.log("Error Occurred:", err);
       }
     };
-
-    fetchUserMusicData();
-
+    
+    
     fetchUserContent();
-  }, [isLoading]);
+    if(user){
+      fetchUserMusicData();
+    }
+  }, [user,isLoading]);
 
   return (
     <div className="main-content bg-gray-900 flex flex-col flex-1">

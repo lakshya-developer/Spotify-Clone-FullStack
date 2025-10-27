@@ -8,11 +8,14 @@ const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
+
+    if (isLoading) return;
+
     // only redirect once loading is done
-    if (!isLoading && !isLoggedIn) {
+    if (!isLoggedIn) {
       navigate("/login");
     }
-  }, [isLoggedIn, isLoading, navigate]);
+  }, [isLoggedIn, isLoading]);
 
   // Show loading screen while checking login status
   if (isLoading) {

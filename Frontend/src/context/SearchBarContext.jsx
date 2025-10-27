@@ -4,11 +4,28 @@ const SearchBarContext = createContext();
 
 function SearchBarProvider({ children }) {
   const [ searchBar, setSearchBar ] = useState(false);
+  const [searchResults, setSearchResults] = useState({
+    songs: [],
+    albums: [],
+    artists: [],
+  });
+  const [browseContent, setBrowseContent] = useState([]); // 🎨 predisplayed categories
+  const [query, setQuery] = useState("");
+  const [error, setError] = useState(null);
+  
 
   return (
     <SearchBarContext.Provider value={{
       searchBar,
-      setSearchBar
+      setSearchBar,
+      searchResults,
+      setSearchResults,
+      browseContent,
+      setBrowseContent,
+      query,
+      setQuery,
+      error,
+      setError,
     }}>
       {children}
     </SearchBarContext.Provider>

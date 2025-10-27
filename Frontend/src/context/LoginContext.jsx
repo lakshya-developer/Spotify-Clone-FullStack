@@ -24,6 +24,7 @@ function LoginProvider({children}) {
       } else {
         setIsLoggedIn(false);
         setUser(null);
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Auth check error:", error);

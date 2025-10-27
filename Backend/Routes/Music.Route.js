@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as MusicController from "../controller/Music.Controller.js";
+import * as SearchController from "../controller/Search.Controller.js"
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
@@ -51,5 +52,6 @@ router.route("/likeAlbum").post(MusicController.postLikeAlbum);
 router.route("/createPlaylist").post(MusicController.createPlaylist);
 router.route("/addToPlaylist").post(MusicController.addToPlaylist);
 router.route("/playlistSongs").post(MusicController.playlistSongs);
+router.route("/search").post(SearchController.searchContent);
 
 export default router;

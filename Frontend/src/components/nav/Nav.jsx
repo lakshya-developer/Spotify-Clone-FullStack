@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 import { useSearchBarContext } from "../../context/SearchBarContext";
+import { Search } from "../Functions/search";
 
 export default function Nav() {
   const { isLoggedIn, setIsLoggedIn, user, setUser } = useLoginCheck();
-  const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const {searchBar, setSearchBar} = useSearchBarContext();
+  const { searchBar, setSearchBar, setSearchResults, setBrowseContent, query, setQuery, setError } = useSearchBarContext();
 
   const handleLogout = async () => {
     try {
@@ -31,8 +31,9 @@ export default function Nav() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (query.trim() !== "") {
-      onSearch(query.trim());
+      Search(query.trim(), setSearchResults, setError);
     }
+    
   };
 
   return (
@@ -51,7 +52,7 @@ export default function Nav() {
             type="text"
             placeholder="Search songs..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {setQuery(e.target.value); Search(query, setSearchResults, setError)}}
             className="bg-transparent text-white placeholder-gray-400 outline-none ml-3 w-full"
           />
           {query && (
