@@ -6,6 +6,7 @@ import { useLoginCheck } from "./context/LoginContext";
 function App() {
   const { isLoggedIn, setIsLoggedIn } = useLoginCheck(); // Destructure the object correctly
   console.log(isLoggedIn);
+  console.log("ENV TEST:", import.meta.env);
   
   return (
     <div className="bg-black text-white min-h-screen m-0 p-0 font-['Roboto']">
