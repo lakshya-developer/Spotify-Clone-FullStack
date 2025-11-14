@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 import { Nav } from "../../components";
 import { usePlayBarContext } from "../../context/PlayBarContext";
+import API_BASE_URL from "../../config";
 
 function YourMusic() {
   const { user } = useLoginCheck();
@@ -25,7 +26,7 @@ function YourMusic() {
     const fetchUserContent = async () => {
       try {
         const userId = user.id;
-        const response = await fetch("http://localhost:3000/api/music/getMusic", {
+        const response = await fetch(`${API_BASE_URL}/api/music/getMusic`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -47,7 +48,7 @@ function YourMusic() {
   // Fetch songs for a specific album
   const fetchAlbumSongs = async (albumId) => {
     try {
-      const response = await fetch("http://localhost:3000/api/music/getMusicInfo", {
+      const response = await fetch(`${API_BASE_URL}/api/music/getMusicInfo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: albumId, type: "album" }),
@@ -105,7 +106,7 @@ function YourMusic() {
     formData.append("albumId", selectedAlbum._id);
 
     try {
-      const response = await fetch("http://localhost:3000/api/music/addToAlbum", {
+      const response = await fetch(`${API_BASE_URL}/api/music/addToAlbum`, {
         method: "POST",
         body: formData,
       });

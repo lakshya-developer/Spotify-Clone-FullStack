@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 import { Nav } from "../../components";
+import API_BASE_URL from "../../config";
 
 function AddMusic() {
   const { isLoggedIn, user } = useLoginCheck();
@@ -34,7 +35,7 @@ function AddMusic() {
     formData.append("userId", userId);
 
     try {
-      const response = await fetch("http://localhost:3000/api/music/addSong", {
+      const response = await fetch(`${API_BASE_URL}/api/music/addSong`, {
         method: "POST",
         body: formData,
       });
@@ -68,7 +69,7 @@ function AddMusic() {
     formData.append("userId", userId);
 
     try {
-      const response = await fetch("http://localhost:3000/api/music/addAlbum", {
+      const response = await fetch(`${API_BASE_URL}/api/music/addAlbum`, {
         method: "POST",
         body: formData,
       });

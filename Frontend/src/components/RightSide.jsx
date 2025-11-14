@@ -8,6 +8,7 @@ import { useAlbumLoadContext } from "../context/AlbumLoadContext";
 import { likeSong, likeAlbum } from "./Functions/likeFunction";
 import HomeLoading from "./ui/HomeLoading";
 import { addToPlaylist } from "./Functions/playlist";
+import API_BASE_URL from "../config";
 
 export default function RightSide() {
   const { isLoading, user } = useLoginCheck();
@@ -36,13 +37,13 @@ export default function RightSide() {
     const fetchUserContent = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/music/getMusicHome",
+          `${API_BASE_URL}/api/music/getMusicHome`,
           {
             credentials: "include",
           }
         );
         const artistResponse = await fetch(
-          "http://localhost:3000/api/music/getArtistsInfo"
+          `${API_BASE_URL}/api/music/getArtistsInfo`
         );
 
         if (response.ok && artistResponse.ok) {
@@ -62,7 +63,7 @@ export default function RightSide() {
     const fetchUserMusicData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/music/getUserMusicData",
+          `${API_BASE_URL}/api/music/getUserMusicData`,
           {
             method: "POST",
             headers: {

@@ -7,6 +7,7 @@ import { likeSong, likeAlbum } from "../Functions/likeFunction";
 import Nav from "../nav/Nav";
 import { useLoginCheck } from "../../context/LoginContext";
 import { createPlaylist, playlistSongs } from "../Functions/playlist";
+import API_BASE_URL from "../../config";
 
 function Library() {
   const { user } = useLoginCheck();
@@ -57,7 +58,7 @@ function Library() {
     const fetchUserMusicData = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/music/getUserMusicData",
+          `${API_BASE_URL}/api/music/getUserMusicData`,
           {
             method: "POST",
             headers: {

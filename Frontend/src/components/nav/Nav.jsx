@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext";
 import { useSearchBarContext } from "../../context/SearchBarContext";
 import { Search } from "../Functions/search";
+import API_BASE_URL from "../../config";
 
 export default function Nav() {
   const { isLoggedIn, setIsLoggedIn, user, setUser } = useLoginCheck();
@@ -11,7 +12,7 @@ export default function Nav() {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/auth/logout", {
+      const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useLoginCheck } from "../context/LoginContext";
 import { Nav } from "../components";
 import { useEffect } from "react";
+import API_BASE_URL from "../config";
 
 function User() {
   const { isLoggedIn, user, setIsLoggedIn, handleLogout } = useLoginCheck();
@@ -16,7 +17,7 @@ function User() {
     if (user.userType === "artist") {
       const fetchAlbumsN0 = async () => {
         const response = await fetch(
-          "http://localhost:3000/api/music/getMusic",
+          `${API_BASE_URL}/api/music/getMusic`,
           {
             method: "POST",
             headers: {

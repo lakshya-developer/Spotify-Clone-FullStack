@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginCheck } from "../../context/LoginContext"; // Adjust the import based on your file structure
+import API_BASE_URL from "../../config";
 
 export default function Login() {
   const { checkAuthStatus } = useLoginCheck();
@@ -31,7 +32,7 @@ export default function Login() {
     if (newErrors.length === 0) {
       // Submit logic here
       try {
-        const response = await fetch("http://localhost:3000/api/auth/login", {
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: "POST",
           credentials: "include",
           headers: {

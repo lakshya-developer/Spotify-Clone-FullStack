@@ -2,6 +2,7 @@ import React from "react";
 import { createContext, useRef, useState } from "react";
 import { useContext } from "react";
 import { useLoginCheck } from "./LoginContext";
+import API_BASE_URL from "../config";
 
 const PlayBarContext = createContext();
 
@@ -20,7 +21,7 @@ function PlayBarProvider({ children }) {
       }
 
       const response = await fetch(
-        "http://localhost:3000/api/music/getMusicInfo",
+        `${API_BASE_URL}/api/music/getMusicInfo`,
         {
           method: "POST",
           credentials: "include",

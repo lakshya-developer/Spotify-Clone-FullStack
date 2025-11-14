@@ -1,7 +1,9 @@
+import API_BASE_URL from "../../config"
+
 export const Search = async (title, setSearchResults, setError) => {
   try {
     const response = await fetch(
-      "http://localhost:3000/api/music/search",
+      `${API_BASE_URL}/api/music/search`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

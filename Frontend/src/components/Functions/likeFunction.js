@@ -1,6 +1,8 @@
+import API_BASE_URL from "../../config"
+
 export const likeSong = async (userId, songId) => {
   try {
-    const response = await fetch("http://localhost:3000/api/music/likeSong",{
+    const response = await fetch(`${API_BASE_URL}/api/music/likeSong`,{
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -17,7 +19,7 @@ export const likeSong = async (userId, songId) => {
 
 export const likeAlbum = async (userId, albumId) => {
   try {
-    const response = await fetch("http://localhost:3000/api/music/likeAlbum",{
+    const response = await fetch(`${API_BASE_URL}/api/music/likeAlbum`,{
       method: "POST",
       headers: {
         "Content-Type": "application/json",

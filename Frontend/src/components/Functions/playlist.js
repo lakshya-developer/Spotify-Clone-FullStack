@@ -1,7 +1,9 @@
+import API_BASE_URL from "../../config"
+
 export const createPlaylist = async (userId, title, setUserContent, setNewPlaylistName, setShowNewPlaylistForm, setError) => {
   try {
     const response = await fetch(
-      "http://localhost:3000/api/music/createPlaylist",
+      `${API_BASE_URL}/api/music/createPlaylist`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,7 +30,7 @@ export const createPlaylist = async (userId, title, setUserContent, setNewPlayli
 export const addToPlaylist = async (userId, playlistName, songId) => {
   try {
     const response = await fetch(
-      "http://localhost:3000/api/music/createPlaylist",
+      `${API_BASE_URL}/api/music/createPlaylist`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +51,7 @@ export const addToPlaylist = async (userId, playlistName, songId) => {
 
 export const playlistSongs = async (userId) => {
   try {
-    const response = await fetch("http://localhost:3000/api/music/playlistSongs",{
+    const response = await fetch(`${API_BASE_URL}/api/music/playlistSongs`,{
       method: "POST",
       headers: { "Content-Type": "application/json"},
       body: JSON.stringify({userId})
