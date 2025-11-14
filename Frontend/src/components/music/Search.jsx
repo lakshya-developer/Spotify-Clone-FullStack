@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
 import { EllipsisVertical } from "lucide-react";
-import axios from "axios";
 import Nav from "../nav/Nav";
 import { usePlayBarContext } from "../../context/PlayBarContext";
 import { useLoginCheck } from "../../context/LoginContext";
