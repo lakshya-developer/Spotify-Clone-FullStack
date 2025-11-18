@@ -20,4 +20,4 @@ router.route('/logout').post(AuthController.logout);
 
 router.route('/checkAuth').get(AuthController.checkLogin);
 
-export default router
+export default router 
