@@ -47,7 +47,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
   cors({
-    origin: "*", // Your frontend URL
+    origin: ["http://localhost:5173","https://spotify-clone-full-stack-psi.vercel.app/"], // Your frontend URL
     credentials: true,
   })
 );
